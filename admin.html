@@ -26,6 +26,7 @@
             display: flex;
             height: 100vh;
             overflow: hidden;
+            width: 100vw;
         }
 
         .sidebar {
@@ -40,6 +41,7 @@
             transition: width 0.3s ease, padding 0.3s ease;
             overflow: hidden;
             white-space: nowrap;
+            z-index: 100;
         }
 
         .sidebar.open {
@@ -99,53 +101,77 @@
             display: flex;
             flex-direction: column;
             overflow: hidden;
+            width: 100%;
         }
 
         .top-bar {
             background-color: var(--primary-green);
             color: white;
-            padding: 12px 20px;
+            padding: 10px 15px;
             display: flex;
             justify-content: space-between;
             align-items: center;
-            gap: 15px;
+            gap: 10px;
             box-shadow: 0 2px 4px rgba(0,0,0,0.1);
         }
 
         .top-bar-left {
             display: flex;
             align-items: center;
-            gap: 15px;
+            gap: 10px;
+            overflow: hidden;
+        }
+
+        .top-bar-left h2 {
+            font-size: 1.1rem;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
         }
 
         .toggle-sidebar-btn {
             background: none;
             border: none;
             color: white;
-            font-size: 1.5rem;
+            font-size: 1.4rem;
             cursor: pointer;
         }
 
         .search-box {
-            padding: 8px 12px;
+            padding: 6px 10px;
             border-radius: 4px;
             border: none;
-            width: 280px;
-            font-size: 0.95rem;
+            width: 180px;
+            font-size: 0.9rem;
+        }
+
+        @media (min-width: 768px) {
+            .search-box { width: 280px; }
+            .top-bar-left h2 { font-size: 1.3rem; }
         }
 
         .content-body {
             flex: 1;
-            padding: 30px;
+            padding: 10px;
             overflow-y: auto;
+            width: 100%;
+        }
+
+        @media (min-width: 768px) {
+            .content-body { padding: 25px; }
         }
 
         .section-view {
             display: none;
             background: var(--card-bg);
-            padding: 25px;
-            border-radius: 10px;
+            padding: 15px;
+            border-radius: 8px;
             box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+            width: 100%;
+        }
+
+        @media (min-width: 768px) {
+            .section-view { padding: 25px; }
         }
 
         .section-view.active {
@@ -154,22 +180,30 @@
 
         .section-header-flex {
             display: flex;
-            justify-content: space-between;
-            align-items: center;
+            flex-direction: column;
+            gap: 8px;
             border-bottom: 2px solid #eee;
             padding-bottom: 10px;
-            margin-bottom: 20px;
+            margin-bottom: 15px;
+        }
+
+        @media (min-width: 600px) {
+            .section-header-flex {
+                flex-direction: row;
+                justify-content: space-between;
+                align-items: center;
+            }
         }
 
         h3 {
             color: var(--accent-red);
-            font-size: 1.4rem;
+            font-size: 1.2rem;
             margin: 0;
         }
 
         .total-count-badge {
             font-weight: bold;
-            font-size: 1.1rem;
+            font-size: 1rem;
             color: var(--text-dark);
         }
 
@@ -184,16 +218,20 @@
             text-align: center;
             font-weight: bold;
             padding: 8px;
-            margin: 20px 0 15px 0;
+            margin: 15px 0 10px 0;
             border-radius: 4px;
-            font-size: 1.1rem;
+            font-size: 1rem;
             border: 1px solid #d4d400;
         }
 
         .form-grid {
             display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 15px;
+            grid-template-columns: 1fr;
+            gap: 12px;
+        }
+
+        @media (min-width: 768px) {
+            .form-grid { grid-template-columns: 1fr 1fr; gap: 15px; }
         }
 
         .form-group {
@@ -204,7 +242,7 @@
 
         .form-group label {
             font-weight: bold;
-            font-size: 0.95rem;
+            font-size: 0.9rem;
         }
 
         .form-control {
@@ -213,6 +251,7 @@
             border: 1px solid #ccc;
             border-radius: 5px;
             font-size: 1rem;
+            width: 100%;
         }
 
         .submit-btn {
@@ -224,7 +263,7 @@
             font-size: 1.1rem;
             font-weight: bold;
             cursor: pointer;
-            margin-top: 25px;
+            margin-top: 20px;
             width: 100%;
         }
 
@@ -232,17 +271,26 @@
             background-color: #005a1d;
         }
 
+        .table-responsive-wrapper {
+            width: 100%;
+            overflow-x: auto;
+            -webkit-overflow-scrolling: touch;
+            margin-top: 10px;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+        }
+
         table {
             width: 100%;
             border-collapse: collapse;
-            margin-top: 15px;
+            white-space: nowrap;
         }
 
         th, td {
             border: 1px solid #ddd;
-            padding: 12px;
+            padding: 10px 12px;
             text-align: center;
-            font-size: 0.95rem;
+            font-size: 0.9rem;
         }
 
         th {
@@ -256,7 +304,7 @@
 
         .action-btns {
             display: flex;
-            gap: 8px;
+            gap: 6px;
             justify-content: center;
         }
 
@@ -264,33 +312,39 @@
             background-color: #2196F3;
             color: white;
             border: none;
-            padding: 6px 12px;
+            padding: 5px 10px;
             border-radius: 4px;
             cursor: pointer;
             font-weight: bold;
+            font-size: 0.85rem;
         }
 
         .btn-delete {
             background-color: var(--accent-red);
             color: white;
             border: none;
-            padding: 6px 12px;
+            padding: 5px 10px;
             border-radius: 4px;
             cursor: pointer;
             font-weight: bold;
+            font-size: 0.85rem;
         }
 
         .stats-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-            gap: 20px;
-            margin-top: 20px;
+            grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+            gap: 12px;
+            margin-top: 15px;
+        }
+
+        @media (min-width: 768px) {
+            .stats-grid { grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 20px; }
         }
 
         .stat-card {
             background: #e8f5e9;
             border: 1px solid #c8e6c9;
-            padding: 20px;
+            padding: 15px;
             border-radius: 8px;
             text-align: center;
             box-shadow: 0 2px 4px rgba(0,0,0,0.05);
@@ -298,12 +352,12 @@
 
         .stat-card h4 {
             color: var(--primary-green);
-            margin-bottom: 10px;
-            font-size: 1.1rem;
+            margin-bottom: 8px;
+            font-size: 0.95rem;
         }
 
         .stat-number {
-            font-size: 2rem;
+            font-size: 1.6rem;
             font-weight: bold;
             color: var(--accent-red);
         }
@@ -330,7 +384,7 @@
                 <h2 id="admin-view-title">SRB-8 এডমিন কন্ট্রোল প্যানেল</h2>
             </div>
             <div id="admin-search-container" style="display: none;">
-                <input type="text" id="adminSearchInput" class="search-box" placeholder="🔍 আইডি, পদবী বা নাম দিয়ে খুঁজুন..." onkeyup="filterAdminTable()">
+                <input type="text" id="adminSearchInput" class="search-box" placeholder="🔍 আইডি বা নাম..." onkeyup="filterAdminTable()">
             </div>
         </div>
 
@@ -442,66 +496,72 @@
             <div id="list-section" class="section-view">
                 <div class="section-header-flex">
                     <h3>সংরক্ষিত তথ্যের তালিকা ও পরিচালনা</h3>
-                    <div class="total-count-badge" id="list-total-count">মোট সংখ্যা - <span>০</span> জন</div>
+                    <div class="total-count-badge" id="list-total-count">মোট - <span>০</span> জন</div>
                 </div>
-                <table>
-                    <thead>
-                        <tr>
-                            <th>নং</th>
-                            <th>ব্যক্তিগত ID (ইউনিট ID)</th>
-                            <th>পদবী</th>
-                            <th>নাম</th>
-                            <th>বাহিনী</th>
-                            <th>গন্তব্যস্থল</th>
-                            <th>রেশন ইউনিট</th>
-                            <th>অ্যাকশন</th>
-                        </tr>
-                    </thead>
-                    <tbody id="admin-table-body"></tbody>
-                </table>
+                <div class="table-responsive-wrapper">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>নং</th>
+                                <th>ব্যক্তিগত ID (ইউনিট ID)</th>
+                                <th>পদবী</th>
+                                <th>নাম</th>
+                                <th>বাহিনী</th>
+                                <th>গন্তব্যস্থল</th>
+                                <th>রেশন ইউনিট</th>
+                                <th>অ্যাকশন</th>
+                            </tr>
+                        </thead>
+                        <tbody id="admin-table-body"></tbody>
+                    </table>
+                </div>
             </div>
 
             <!-- ডিলেট সদস্যদের তালিকা সেকশন -->
             <div id="deleted-section" class="section-view">
                 <div class="section-header-flex">
                     <h3>ডিলেট করা সদস্যদের তালিকা</h3>
-                    <div class="total-count-badge" id="deleted-total-count">মোট সংখ্যা - <span>০</span> জন</div>
+                    <div class="total-count-badge" id="deleted-total-count">মোট - <span>০</span> জন</div>
                 </div>
-                <table>
-                    <thead>
-                        <tr>
-                            <th>নং</th>
-                            <th>ব্যক্তিগত ID</th>
-                            <th>নাম</th>
-                            <th>পদবী</th>
-                            <th>বাহিনী</th>
-                            <th>গন্তব্যস্থল</th>
-                            <th>অ্যাকশন</th>
-                        </tr>
-                    </thead>
-                    <tbody id="deleted-table-body"></tbody>
-                </table>
+                <div class="table-responsive-wrapper">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>নং</th>
+                                <th>ব্যক্তিগত ID</th>
+                                <th>নাম</th>
+                                <th>পদবী</th>
+                                <th>বাহিনী</th>
+                                <th>গন্তব্যস্থল</th>
+                                <th>অ্যাকশন</th>
+                            </tr>
+                        </thead>
+                        <tbody id="deleted-table-body"></tbody>
+                    </table>
+                </div>
             </div>
 
             <!-- রেশন পরিবর্তনের তালিকা সেকশন -->
             <div id="ration-log-section" class="section-view">
                 <div class="section-header-flex">
-                    <h3>রেশন সংখ্যা পরিবর্তনের তালিকা (চলতি মাসভিত্তিক)</h3>
-                    <div class="total-count-badge" id="ration-total-count">মোট সংখ্যা - <span>০</span> জন</div>
+                    <h3>রেশন পরিবর্তনের তালিকা</h3>
+                    <div class="total-count-badge" id="ration-total-count">মোট - <span>০</span> জন</div>
                 </div>
-                <table>
-                    <thead>
-                        <tr>
-                            <th>নং</th>
-                            <th>সদস্যের নাম ও আইডি</th>
-                            <th>মাসের নাম</th>
-                            <th>পুরাতন ইউনিট</th>
-                            <th>আপডেটকৃত ইউনিট</th>
-                            <th>অ্যাকশন</th>
-                        </tr>
-                    </thead>
-                    <tbody id="ration-log-body"></tbody>
-                </table>
+                <div class="table-responsive-wrapper">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>নং</th>
+                                <th>সদস্যের নাম ও আইডি</th>
+                                <th>মাসের নাম</th>
+                                <th>পুরাতন ইউনিট</th>
+                                <th>আপডেটকৃত ইউনিট</th>
+                                <th>অ্যাকশন</th>
+                            </tr>
+                        </thead>
+                        <tbody id="ration-log-body"></tbody>
+                    </table>
+                </div>
             </div>
         </div>
     </div>
@@ -526,15 +586,12 @@
         let recordsCache = [];
         let deletedCache = [];
         let rationLogCache = [];
-
         let currentAdminSection = 'dashboard';
 
         function formatRationDisplay(rationStr) {
             if(!rationStr) return '';
             let parts = rationStr.split(' ');
-            let num = parts[0];
-            let unitText = parts[1] || 'ইউনিট';
-            return `<span style="font-weight: bold; color: red;">${num}</span> ${unitText}`;
+            return `<span style="font-weight: bold; color: red;">${parts[0]}</span> ${parts[1] || 'ইউনিট'}`;
         }
         window.formatRationDisplay = formatRationDisplay;
 
@@ -554,24 +611,12 @@
                 document.getElementById('admin-view-title').innerText = "SRB-8 এডমিন কন্ট্রোল প্যানেল";
                 document.getElementById('admin-search-container').style.display = 'none';
                 loadDashboard();
-            } else if(sectionId === 'list') {
-                document.getElementById('admin-view-title').innerText = "তথ্য তালিকা";
-                document.getElementById('admin-search-container').style.display = 'block';
-                document.getElementById('adminSearchInput').value = '';
-                loadAdminTable();
-            } else if(sectionId === 'deleted') {
-                document.getElementById('admin-view-title').innerText = "ডিলেট সদস্যদের তালিকা";
-                document.getElementById('admin-search-container').style.display = 'block';
-                document.getElementById('adminSearchInput').value = '';
-                loadDeletedTable();
-            } else if(sectionId === 'ration-log') {
-                document.getElementById('admin-view-title').innerText = "রেশন পরিবর্তনের তালিকা";
-                document.getElementById('admin-search-container').style.display = 'block';
-                document.getElementById('adminSearchInput').value = '';
-                loadRationLogTable();
             } else {
-                document.getElementById('admin-view-title').innerText = "SRB-8 এডমিন কন্ট্রোল প্যানেল";
-                document.getElementById('admin-search-container').style.display = 'none';
+                document.getElementById('admin-search-container').style.display = 'block';
+                document.getElementById('adminSearchInput').value = '';
+                if(sectionId === 'list') { document.getElementById('admin-view-title').innerText = "তথ্য তালিকা"; loadAdminTable(); }
+                if(sectionId === 'deleted') { document.getElementById('admin-view-title').innerText = "ডিলেট তালিকা"; loadDeletedTable(); }
+                if(sectionId === 'ration-log') { document.getElementById('admin-view-title').innerText = "রেশন তালিকা"; loadRationLogTable(); }
             }
         }
 
@@ -583,17 +628,11 @@
         function loadDashboard() {
             const forces = ["সেনাবাহিনী", "নৌবাহিনীর", "বিমানবাহিনীর", "বিজিবি", "পুলিশ", "আনসার বাহিনী", "সাধারণ"];
             const container = document.getElementById('dashboard-stats');
-            container.innerHTML = '';
-
-            let total = recordsCache.length;
-            let html = `<div class="stat-card"><h4>মোট সদস্য</h4><div class="stat-number">${total}</div></div>`;
-
+            container.innerHTML = `<div class="stat-card"><h4>মোট সদস্য</h4><div class="stat-number">${recordsCache.length}</div></div>`;
             forces.forEach(f => {
                 let count = recordsCache.filter(r => r.force === f).length;
-                html += `<div class="stat-card"><h4>${f}</h4><div class="stat-number">${count}</div></div>`;
+                container.innerHTML += `<div class="stat-card"><h4>${f}</h4><div class="stat-number">${count}</div></div>`;
             });
-
-            container.innerHTML = html;
         }
 
         window.handleFormSubmit = async function(e) {
@@ -614,34 +653,27 @@
             };
 
             const editId = document.getElementById('edit_id').value;
-
             try {
                 if(editId === "") {
                     await addDoc(collection(db, "srb8_records"), record);
-                    alert('সফলভাবে নতুন তথ্য যুক্ত করা হয়েছে!');
+                    alert('তথ্য সফলভাবে যুক্ত করা হয়েছে!');
                 } else {
                     let oldRecord = recordsCache.find(r => r.id === editId);
                     if(oldRecord && oldRecord.ration !== record.ration) {
                         await addDoc(collection(db, "srb8_ration_logs"), {
-                            name: record.name,
-                            p_id: record.p_id,
-                            month: getCurrentMonthName(),
-                            old_ration: oldRecord.ration,
-                            new_ration: record.ration
+                            name: record.name, p_id: record.p_id, month: getCurrentMonthName(),
+                            old_ration: oldRecord.ration, new_ration: record.ration
                         });
                     }
-                    const docRef = doc(db, "srb8_records", editId);
-                    await updateDoc(docRef, record);
-                    alert('তথ্য সফলভাবে আপডেট করা হয়েছে!');
+                    await updateDoc(doc(db, "srb8_records", editId), record);
+                    alert('তথ্য আপডেট করা হয়েছে!');
                     document.getElementById('edit_id').value = "";
                     document.getElementById('form-title').innerText = "নতুন তথ্য এন্ট্রি ফর্ম";
                     document.getElementById('submit-btn-text').innerText = "তথ্য সংরক্ষণ করুন";
                 }
-
                 document.getElementById('biodata-form').reset();
                 window.switchSection('list', document.querySelectorAll('.menu-btn')[2]);
             } catch (error) {
-                console.error("Error saving document: ", error);
                 alert("তথ্য সংরক্ষণ করতে সমস্যা হয়েছে।");
             }
         }
@@ -649,120 +681,58 @@
         window.loadAdminTable = function(searchQuery = '') {
             const tbody = document.getElementById('admin-table-body');
             tbody.innerHTML = '';
-
             let filtered = recordsCache;
             if(searchQuery.trim() !== '') {
                 const q = searchQuery.toLowerCase();
-                filtered = recordsCache.filter(r => 
-                    (r.p_id && r.p_id.toLowerCase().includes(q)) ||
-                    (r.u_id && r.u_id.toLowerCase().includes(q)) ||
-                    (r.rank && r.rank.toLowerCase().includes(q)) ||
-                    (r.name && r.name.toLowerCase().includes(q)) ||
-                    (r.force && r.force.toLowerCase().includes(q))
-                );
+                filtered = recordsCache.filter(r => (r.p_id?.toLowerCase().includes(q)) || (r.name?.toLowerCase().includes(q)) || (r.rank?.toLowerCase().includes(q)));
             }
-
-            document.getElementById('list-total-count').innerHTML = `মোট সংখ্যা - <span>${filtered.length}</span> জন`;
-
-            if(filtered.length === 0) {
-                tbody.innerHTML = `<tr><td colspan="8" style="text-align:center; color:#777;">কোনো তথ্য পাওয়া যায়নি।</td></tr>`;
-                return;
-            }
-
-            filtered.forEach((r, index) => {
-                tbody.innerHTML += `
-                    <tr>
-                        <td>${index + 1}</td>
-                        <td><b>${r.p_id}</b><br><small style="color:blue;">${r.u_id}</small></td>
-                        <td>${r.rank}</td>
-                        <td>${r.name}</td>
-                        <td>${r.force}</td>
-                        <td>${r.destination}</td>
-                        <td>${formatRationDisplay(r.ration)}</td>
-                        <td>
-                            <div class="action-btns">
-                                <button class="btn-edit" onclick="editRecord('${r.id}')">এডিট</button>
-                                <button class="btn-delete" onclick="deleteRecord('${r.id}')">ডিলেট</button>
-                            </div>
-                        </td>
-                    </tr>
-                `;
+            document.getElementById('list-total-count').innerHTML = `মোট - <span>${filtered.length}</span> জন`;
+            if(filtered.length === 0) { tbody.innerHTML = `<tr><td colspan="8" style="text-align:center; color:#777;">কোনো তথ্য পাওয়া যায়নি।</td></tr>`; return; }
+            filtered.forEach((r, i) => {
+                tbody.innerHTML += `<tr>
+                    <td>${i + 1}</td>
+                    <td><b>${r.p_id}</b><br><small style="color:blue;">${r.u_id}</small></td>
+                    <td>${r.rank}</td><td>${r.name}</td><td>${r.force}</td><td>${r.destination}</td>
+                    <td>${formatRationDisplay(r.ration)}</td>
+                    <td><div class="action-btns"><button class="btn-edit" onclick="editRecord('${r.id}')">এডিট</button><button class="btn-delete" onclick="deleteRecord('${r.id}')">ডিলেট</button></div></td>
+                </tr>`;
             });
         }
 
         window.loadDeletedTable = function(searchQuery = '') {
             const tbody = document.getElementById('deleted-table-body');
             tbody.innerHTML = '';
-
             let filtered = deletedCache;
             if(searchQuery.trim() !== '') {
                 const q = searchQuery.toLowerCase();
-                filtered = deletedCache.filter(r => 
-                    (r.p_id && r.p_id.toLowerCase().includes(q)) ||
-                    (r.rank && r.rank.toLowerCase().includes(q)) ||
-                    (r.name && r.name.toLowerCase().includes(q)) ||
-                    (r.force && r.force.toLowerCase().includes(q))
-                );
+                filtered = deletedCache.filter(r => (r.p_id?.toLowerCase().includes(q)) || (r.name?.toLowerCase().includes(q)));
             }
-
-            document.getElementById('deleted-total-count').innerHTML = `মোট সংখ্যা - <span>${filtered.length}</span> জন`;
-
-            if(filtered.length === 0) {
-                tbody.innerHTML = `<tr><td colspan="7" style="text-align:center; color:#777;">কোনো ডিলেট করা তথ্য নেই।</td></tr>`;
-                return;
-            }
-
-            filtered.forEach((r, index) => {
-                tbody.innerHTML += `
-                    <tr>
-                        <td>${index + 1}</td>
-                        <td><b>${r.p_id}</b></td>
-                        <td>${r.name}</td>
-                        <td>${r.rank}</td>
-                        <td>${r.force}</td>
-                        <td>${r.destination}</td>
-                        <td>
-                            <button class="btn-delete" onclick="permanentlyDeleteRecord('${r.id}')">স্থায়ী ডিলেট</button>
-                        </td>
-                    </tr>
-                `;
+            document.getElementById('deleted-total-count').innerHTML = `মোট - <span>${filtered.length}</span> জন`;
+            if(filtered.length === 0) { tbody.innerHTML = `<tr><td colspan="7" style="text-align:center; color:#777;">কোনো তথ্য নেই।</td></tr>`; return; }
+            filtered.forEach((r, i) => {
+                tbody.innerHTML += `<tr>
+                    <td>${i + 1}</td><td><b>${r.p_id}</b></td><td>${r.name}</td><td>${r.rank}</td><td>${r.force}</td><td>${r.destination}</td>
+                    <td><button class="btn-delete" onclick="permanentlyDeleteRecord('${r.id}')">স্থায়ী ডিলেট</button></td>
+                </tr>`;
             });
         }
 
         window.loadRationLogTable = function(searchQuery = '') {
             const tbody = document.getElementById('ration-log-body');
             tbody.innerHTML = '';
-
             let filtered = rationLogCache;
             if(searchQuery.trim() !== '') {
                 const q = searchQuery.toLowerCase();
-                filtered = rationLogCache.filter(l => 
-                    (l.name && l.name.toLowerCase().includes(q)) ||
-                    (l.p_id && l.p_id.toLowerCase().includes(q)) ||
-                    (l.month && l.month.toLowerCase().includes(q))
-                );
+                filtered = rationLogCache.filter(l => (l.name?.toLowerCase().includes(q)) || (l.p_id?.toLowerCase().includes(q)));
             }
-
-            document.getElementById('ration-total-count').innerHTML = `মোট সংখ্যা - <span>${filtered.length}</span> জন`;
-
-            if(filtered.length === 0) {
-                tbody.innerHTML = `<tr><td colspan="6" style="text-align:center; color:#777;">রেশন পরিবর্তনের কোনো রেকর্ড নেই।</td></tr>`;
-                return;
-            }
-
-            filtered.forEach((l, index) => {
-                tbody.innerHTML += `
-                    <tr>
-                        <td>${index + 1}</td>
-                        <td>${l.name} <br><small>(${l.p_id})</small></td>
-                        <td><b>${l.month}</b></td>
-                        <td>${formatRationDisplay(l.old_ration)}</td>
-                        <td>${formatRationDisplay(l.new_ration)}</td>
-                        <td>
-                            <button class="btn-delete" onclick="deleteRationLog('${l.id}')">ডিলেট</button>
-                        </td>
-                    </tr>
-                `;
+            document.getElementById('ration-total-count').innerHTML = `মোট - <span>${filtered.length}</span> জন`;
+            if(filtered.length === 0) { tbody.innerHTML = `<tr><td colspan="6" style="text-align:center; color:#777;">কোনো রেকর্ড নেই।</td></tr>`; return; }
+            filtered.forEach((l, i) => {
+                tbody.innerHTML += `<tr>
+                    <td>${i + 1}</td><td>${l.name} <br><small>(${l.p_id})</small></td><td><b>${l.month}</b></td>
+                    <td>${formatRationDisplay(l.old_ration)}</td><td>${formatRationDisplay(l.new_ration)}</td>
+                    <td><button class="btn-delete" onclick="deleteRationLog('${l.id}')">ডিলেট</button></td>
+                </tr>`;
             });
         }
 
@@ -776,7 +746,6 @@
         window.editRecord = function(id) {
             const r = recordsCache.find(item => item.id === id);
             if(!r) return;
-
             document.getElementById('p_id').value = r.p_id;
             document.getElementById('u_id').value = r.u_id;
             document.getElementById('rank').value = r.rank;
@@ -789,64 +758,39 @@
             document.getElementById('nid').value = r.nid;
             document.getElementById('dob').value = r.dob;
             document.getElementById('religion').value = r.religion;
-
             document.getElementById('edit_id').value = id;
-            document.getElementById('form-title').innerText = "তথ্য এডিট ও আপডেট ফর্ম";
+            document.getElementById('form-title').innerText = "তথ্য আপডেট ফর্ম";
             document.getElementById('submit-btn-text').innerText = "আপডেট করুন";
-
             switchSection('add', document.querySelectorAll('.menu-btn')[1]);
         }
 
         window.deleteRecord = async function(id) {
-            if(confirm('আপনি কি নিশ্চিতভাবে এই তথ্যটি ডিলেট করতে চান?')) {
-                try {
-                    const r = recordsCache.find(item => item.id === id);
-                    if(r) {
-                        await addDoc(collection(db, "srb8_deleted_records"), r);
-                        await deleteDoc(doc(db, "srb8_records", id));
-                        loadAdminTable(document.getElementById('adminSearchInput').value);
-                    }
-                } catch(err) {
-                    console.error("Error deleting record: ", err);
-                    alert("ডিলেট করতে সমস্যা হয়েছে।");
+            if(confirm('আপনি কি এই তথ্যটি ডিলেট করতে চান?')) {
+                const r = recordsCache.find(item => item.id === id);
+                if(r) {
+                    await addDoc(collection(db, "srb8_deleted_records"), r);
+                    await deleteDoc(doc(db, "srb8_records", id));
                 }
             }
         }
 
         window.permanentlyDeleteRecord = async function(id) {
-            if(confirm('আপনি কি এই রেকর্ডটি স্থায়ীভাবে মুছে ফেলতে চান?')) {
-                try {
-                    await deleteDoc(doc(db, "srb8_deleted_records", id));
-                    loadDeletedTable(document.getElementById('adminSearchInput').value);
-                } catch(err) {
-                    console.error("Error permanent delete: ", err);
-                }
-            }
+            if(confirm('স্থায়ীভাবে মুছে ফেলতে চান?')) await deleteDoc(doc(db, "srb8_deleted_records", id));
         }
 
         window.deleteRationLog = async function(id) {
-            if(confirm('আপনি কি এই রেশন পরিবর্তনের রেকর্ডটি ডিলেট করতে চান?')) {
-                try {
-                    await deleteDoc(doc(db, "srb8_ration_logs", id));
-                    loadRationLogTable(document.getElementById('adminSearchInput').value);
-                } catch(err) {
-                    console.error("Error deleting ration log: ", err);
-                }
-            }
+            if(confirm('ডিলেট করতে চান?')) await deleteDoc(doc(db, "srb8_ration_logs", id));
         }
 
-        // Realtime listeners
         onSnapshot(collection(db, "srb8_records"), (snapshot) => {
             recordsCache = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
             if(currentAdminSection === 'dashboard') loadDashboard();
             if(currentAdminSection === 'list') loadAdminTable(document.getElementById('adminSearchInput').value);
         });
-
         onSnapshot(collection(db, "srb8_deleted_records"), (snapshot) => {
             deletedCache = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
             if(currentAdminSection === 'deleted') loadDeletedTable(document.getElementById('adminSearchInput').value);
         });
-
         onSnapshot(collection(db, "srb8_ration_logs"), (snapshot) => {
             rationLogCache = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
             if(currentAdminSection === 'ration-log') loadRationLogTable(document.getElementById('adminSearchInput').value);
