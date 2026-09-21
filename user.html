@@ -117,6 +117,8 @@
             color: white;
             font-size: 1.4rem;
             cursor: pointer;
+            display: inline-block !important;
+            visibility: visible !important;
         }
 
         .top-bar h1 {
@@ -487,7 +489,7 @@
             document.getElementById('user-table-total-count').innerHTML = `মোট - <span>${filteredRecords.length}</span> জন`;
             if(filteredRecords.length === 0) { tbody.innerHTML = `<tr><td colspan="6" style="text-align:center; padding:15px; color:#777;">কোনো তথ্য পাওয়া যায়নি।</td></tr>`; return; }
 
-            filteredRecords.forEach((r, i) => {
+            filteredrecords.forEach((r, i) => {
                 tbody.innerHTML += `<tr>
                     <td>${i + 1}</td>
                     <td><b>${r.p_id}</b><br><small style="color:#d32f2f; font-weight:bold;">${r.u_id}</small></td>
