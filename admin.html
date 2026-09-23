@@ -1,0 +1,914 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SRB-8 - এডমিন প্যানেল</title>
+    <style>
+        :root {
+            --primary-green: #007626;
+            --accent-red: #d32f2f;
+            --bg-gray: #f4f6f8;
+            --card-bg: #ffffff;
+            --text-dark: #333333;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'SolaimanLipi', Arial, sans-serif;
+        }
+
+        body {
+            background-color: var(--bg-gray);
+            color: var(--text-dark);
+            display: flex;
+            height: 100vh;
+            overflow: hidden;
+        }
+
+        /* লগইন ওভারলে স্টাইল */
+        #login-overlay {
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0, 0, 0, 0.7);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 9999;
+        }
+
+        .login-card {
+            background: white;
+            padding: 30px;
+            border-radius: 8px;
+            width: 350px;
+            max-width: 90%;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+            text-align: center;
+        }
+
+        .login-card h2 {
+            color: var(--primary-green);
+            margin-bottom: 15px;
+            font-size: 1.4rem;
+        }
+
+        .login-card input {
+            width: 100%;
+            padding: 10px;
+            margin: 10px 0;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            font-size: 0.95rem;
+        }
+
+        .login-card button {
+            width: 100%;
+            padding: 10px;
+            background-color: var(--primary-green);
+            color: white;
+            border: none;
+            border-radius: 4px;
+            font-weight: bold;
+            font-size: 1rem;
+            cursor: pointer;
+            margin-top: 10px;
+        }
+
+        .login-error {
+            color: var(--accent-red);
+            font-size: 0.85rem;
+            margin-top: 5px;
+            display: none;
+        }
+
+        .sidebar {
+            width: 0;
+            background-color: var(--primary-green);
+            color: white;
+            display: flex;
+            flex-direction: column;
+            padding: 10px 0;
+            gap: 10px;
+            box-shadow: 2px 0 5px rgba(0,0,0,0.1);
+            transition: width 0.3s ease, padding 0.3s ease;
+            overflow: hidden;
+            white-space: nowrap;
+        }
+
+        .sidebar.open {
+            width: 240px;
+            padding: 15px 10px;
+        }
+
+        @media (max-width: 768px) {
+            .sidebar {
+                position: fixed;
+                top: 0;
+                left: 0;
+                height: 100vh;
+                height: 100dvh;
+                max-height: 100dvh;
+                z-index: 1000;
+                overflow-y: auto;
+                overflow-x: hidden;
+                -webkit-overflow-scrolling: touch;
+                padding-bottom: calc(15px + env(safe-area-inset-bottom));
+            }
+            .sidebar.open {
+                width: min(280px, 82vw);
+            }
+            .sidebar-bottom-links {
+                flex-shrink: 0;
+                padding: 8px 0 calc(8px + env(safe-area-inset-bottom));
+                background: var(--primary-green);
+                position: sticky;
+                bottom: 0;
+                z-index: 2;
+            }
+        }
+
+        .sidebar h2 {
+            font-size: 1.2rem;
+            text-align: center;
+            border-bottom: 1px solid rgba(255,255,255,0.2);
+            padding-bottom: 8px;
+        }
+
+        .sidebar-menu {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .menu-btn {
+            background: white;
+            color: var(--text-dark);
+            border: none;
+            padding: 8px 10px;
+            border-radius: 4px;
+            cursor: pointer;
+            text-align: left;
+            font-weight: bold;
+            font-size: 0.9rem;
+            transition: 0.2s;
+        }
+
+        .menu-btn:hover, .menu-btn.active {
+            background-color: #e8f5e9;
+            color: var(--primary-green);
+            padding-left: 15px;
+        }
+
+        .sidebar-bottom-links {
+            margin-top: auto;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .login-btn {
+            background-color: var(--primary-green);
+            color: white;
+            border: none;
+            text-align: center;
+            padding: 8px;
+            border-radius: 4px;
+            font-weight: bold;
+            font-size: 0.9rem;
+            cursor: pointer;
+        }
+
+        .logout-btn {
+            background-color: var(--accent-red);
+            color: white;
+            border: none;
+            text-align: center;
+            padding: 8px;
+            border-radius: 4px;
+            font-weight: bold;
+            font-size: 0.9rem;
+            cursor: pointer;
+        }
+
+        .main-content {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+
+        .top-bar {
+            background-color: var(--primary-green);
+            color: white;
+            padding: 8px 12px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 10px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+
+        .top-bar-left {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .toggle-sidebar-btn {
+            background: none;
+            border: none;
+            color: white;
+            font-size: 1.3rem;
+            cursor: pointer;
+        }
+
+        .search-box {
+            padding: 6px 10px;
+            border-radius: 4px;
+            border: none;
+            width: 180px;
+            font-size: 0.85rem;
+        }
+
+        .content-body {
+            flex: 1;
+            padding: 10px;
+            overflow: auto;
+        }
+
+        .section-view {
+            display: none;
+            background: var(--card-bg);
+            padding: 15px;
+            border-radius: 6px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+            min-width: 600px;
+        }
+
+        .section-view.active {
+            display: block;
+        }
+
+        .section-header-flex {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 2px solid #eee;
+            padding-bottom: 8px;
+            margin-bottom: 12px;
+        }
+
+        h3 {
+            color: var(--accent-red);
+            font-size: 1.2rem;
+            margin: 0;
+        }
+
+        .total-count-badge {
+            font-weight: bold;
+            font-size: 0.95rem;
+            color: var(--text-dark);
+        }
+
+        .total-count-badge span {
+            color: var(--accent-red);
+            font-weight: bold;
+        }
+
+        .form-section-title {
+            background-color: yellow;
+            color: black;
+            text-align: center;
+            font-weight: bold;
+            padding: 6px;
+            margin: 15px 0 10px 0;
+            border-radius: 4px;
+            font-size: 0.95rem;
+            border: 1px solid #d4d400;
+        }
+
+        .form-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+        }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+            gap: 3px;
+        }
+
+        .form-group label {
+            font-weight: bold;
+            font-size: 0.85rem;
+        }
+
+        .form-control {
+            padding: 8px;
+            background-color: #e8e8e8;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            font-size: 0.9rem;
+        }
+
+        .submit-btn {
+            background-color: var(--primary-green);
+            color: white;
+            padding: 10px;
+            border: none;
+            border-radius: 4px;
+            font-size: 1rem;
+            font-weight: bold;
+            cursor: pointer;
+            margin-top: 15px;
+            width: 100%;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 10px;
+            white-space: nowrap;
+        }
+
+        th, td {
+            border: 1px solid #ddd;
+            padding: 8px 10px;
+            text-align: center;
+            font-size: 0.85rem;
+        }
+
+        th {
+            background-color: var(--primary-green);
+            color: white;
+        }
+
+        tr:nth-child(even) {
+            background-color: #f9f9f9;
+        }
+
+        .action-btns {
+            display: flex;
+            gap: 5px;
+            justify-content: center;
+        }
+
+        .btn-edit, .btn-delete {
+            border: none;
+            padding: 4px 8px;
+            border-radius: 3px;
+            cursor: pointer;
+            font-weight: bold;
+            font-size: 0.8rem;
+        }
+
+        .btn-edit { background-color: #2196F3; color: white; }
+        .btn-delete { background-color: var(--accent-red); color: white; }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+            gap: 10px;
+            margin-top: 10px;
+        }
+
+        .stat-card {
+            background: #e8f5e9;
+            border: 1px solid #c8e6c9;
+            padding: 12px;
+            border-radius: 6px;
+            text-align: center;
+        }
+
+        .stat-card h4 {
+            color: var(--primary-green);
+            margin-bottom: 6px;
+            font-size: 0.9rem;
+        }
+
+        .stat-number {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: var(--accent-red);
+        }
+
+        /* অ্যাপস ইউজার কার্ডের হলুদ স্টাইল */
+        .stat-card.yellow-card {
+            background: #ffeb3b;
+            border: 1px solid #fbc02d;
+        }
+        .stat-card.yellow-card h4 {
+            color: #000000;
+        }
+        .stat-card.yellow-card .stat-number {
+            color: var(--accent-red);
+        }
+
+        /* Responsive enhancement — existing design/colors preserved */
+        @media (max-width: 700px) {
+            body { height: 100dvh; }
+            .sidebar.open { width: min(240px, 82vw); position: fixed; left: 0; top: 0; bottom: 0; z-index: 9000; }
+            .main-content { width: 100%; min-width: 0; }
+            .top-bar { position: sticky; top: 0; z-index: 100; }
+            .top-bar-left h2 { font-size: .9rem !important; }
+            .search-box { width: 135px; max-width: 38vw; }
+            .content-body { padding: 7px; }
+            .section-view { min-width: 0; width: 100%; }
+            .form-grid { grid-template-columns: 1fr; }
+            .table-wrap { overflow-x: auto; -webkit-overflow-scrolling: touch; }
+            table { min-width: 760px; }
+        }
+
+        .security-tools { display:flex; gap:8px; flex-wrap:wrap; margin-top:10px; }
+        .tool-btn { border:1px solid #ccc; background:#fff; padding:7px 10px; border-radius:4px; cursor:pointer; font-weight:bold; }
+        .tool-btn:hover { background:#e8f5e9; }
+        .backup-file-input { display:none; }
+        .restore-btn { background:#fff3cd; border-color:#f0c36d; }
+    
+        .active-admin-email { background:#e8f5e9; color:#075b1f; border:1px solid rgba(255,255,255,.7); padding:8px 7px; border-radius:5px; font-size:.72rem; font-weight:bold; text-align:center; white-space:normal; overflow-wrap:anywhere; line-height:1.25; }
+</style>
+
+    <script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-firestore-compat.js"></script>
+    <script src="firebase-config.js"></script>
+</head>
+<body>
+
+    <!-- অনলাইন Google Login + Personal Password -->
+    <div id="login-overlay">
+        <div class="login-card">
+            <h2>এডমিন প্যানেল লগইন</h2>
+            <p id="loginStepText" style="font-size:.85rem;color:#666;margin-bottom:10px;">Google Account নির্বাচন করুন</p>
+            <button type="button" id="googleSelectBtn" onclick="startGoogleLogin()">🔐 Google Account নির্বাচন</button>
+            <div id="selectedAccountBox" style="display:none;margin-top:10px;padding:10px;border:1px solid #ddd;border-radius:6px;background:#f7f7f7;text-align:left;">
+                <b>নির্বাচিত Gmail:</b><br><span id="selectedAccountEmail"></span>
+            </div>
+            <form id="personalPasswordForm" onsubmit="handlePersonalPassword(event)" style="display:none;">
+                <input type="password" id="adminPasswordInput" placeholder="ব্যক্তিগত পাসওয়ার্ড" autocomplete="current-password">
+                <input type="password" id="adminPasswordConfirm" placeholder="পাসওয়ার্ড নিশ্চিত করুন" autocomplete="new-password" style="display:none;">
+                <input type="text" id="adminRecoveryInput" placeholder="রিকভারি কোড (৬ সংখ্যা)" inputmode="numeric" maxlength="6" style="display:none;">
+                <button type="submit" id="loginSubmitBtn">লগইন করুন</button>
+            </form>
+            <button type="button" id="resetPasswordBtn" class="tool-btn restore-btn" style="display:none;width:100%;margin-top:8px;">পাসওয়ার্ড রিসেট</button>
+            <button type="button" id="changeGoogleAccountBtn" style="display:none;width:100%;margin-top:8px;background:#eee;color:#333;border:0;border-radius:4px;padding:9px;font-weight:bold;" onclick="changeGoogleAccount()">অন্য Gmail নির্বাচন</button>
+            <div id="loginErrorMsg" class="login-error"></div>
+        </div>
+    </div>
+    <div class="sidebar" id="sidebar">
+        <h2>এডমিন প্যানেল</h2>
+        <div class="sidebar-menu">
+            <button class="menu-btn active" onclick="switchSection('dashboard', this)">📊 ড্যাশবোর্ড</button>
+            <button class="menu-btn" onclick="switchSection('add', this)">➕ তথ্য এড</button>
+            <button class="menu-btn" onclick="switchSection('list', this)">📋 তথ্য তালিকা</button>
+            <button class="menu-btn" onclick="switchSection('deleted', this)">🗑️ ডিলেট তালিকা</button>
+            <button class="menu-btn" onclick="switchSection('ration-log', this)">📜 রেশন লগ</button>
+            <button class="menu-btn" onclick="switchSection('settings', this)">⚙️ Settings</button>
+        </div>
+        <div class="sidebar-bottom-links">
+            <div id="active-admin-email" class="active-admin-email" style="display:none;"></div>
+            <button id="adminAuthBtn" class="login-btn" onclick="handleAdminAuth()">🔐 লগইন</button>
+        </div>
+    </div>
+
+    <div class="main-content">
+        <div class="top-bar">
+            <div class="top-bar-left">
+                <button class="toggle-sidebar-btn" onclick="toggleSidebar()">☰</button>
+                <h2 id="admin-view-title" style="font-size: 1rem;">SRB-8 এডমিন প্যানেল</h2>
+            </div>
+            <div id="admin-search-container" style="display: none;">
+                <input type="text" id="adminSearchInput" class="search-box" placeholder="🔍 খুঁজুন..." onkeyup="filterAdminTable()">
+            </div>
+        </div>
+
+        <div class="content-body">
+            <!-- ড্যাশবোর্ড সেকশন -->
+            <div id="dashboard-section" class="section-view active">
+                <div class="section-header-flex">
+                    <h3>সক্রিয় সদস্য সংখ্যা (ড্যাশবোর্ড)</h3>
+                </div>
+                <div class="stats-grid" id="dashboard-stats"></div>
+            </div>
+
+            <!-- Settings সেকশন -->
+            <div id="settings-section" class="section-view">
+                <div class="section-header-flex">
+                    <h3>⚙️ Settings</h3>
+                </div>
+                <div class="security-tools settings-tools">
+                    <button class="tool-btn" onclick="exportBackup()">💾 ব্যাকআপ নিন</button>
+                    <button class="tool-btn restore-btn" onclick="document.getElementById('restoreFile').click()">♻️ ব্যাকআপ রিসেট / Restore</button>
+                    <input id="restoreFile" class="backup-file-input" type="file" accept="application/json" onchange="restoreBackup(event)">
+                </div>
+            </div>
+
+            <!-- তথ্য এড সেকশন -->
+            <div id="add-section" class="section-view">
+                <div class="section-header-flex">
+                    <h3 id="form-title">নতুন তথ্য এন্ট্রি ফর্ম</h3>
+                </div>
+                <form id="biodata-form" onsubmit="handleFormSubmit(event)">
+                    <input type="hidden" id="edit_index" value="">
+                    
+                    <div class="form-section-title">মূল অংশ</div>
+                    <div class="form-grid">
+                        <div class="form-group">
+                            <label>ব্যক্তিগত ID</label>
+                            <input type="text" id="p_id" class="form-control" required>
+                        </div>
+                        <div class="form-group">
+                            <label>ইউনিটের ID</label>
+                            <input type="text" id="u_id" class="form-control" required>
+                        </div>
+                        <div class="form-group">
+                            <label>পদবী</label>
+                            <input type="text" id="rank" class="form-control" required>
+                        </div>
+                        <div class="form-group">
+                            <label>নাম</label>
+                            <input type="text" id="name" class="form-control" required>
+                        </div>
+                        <div class="form-group">
+                            <label>কর্ম</label>
+                            <input type="text" id="duty" class="form-control" required>
+                        </div>
+                        <div class="form-group">
+                            <label>মোবাইল</label>
+                            <input type="text" id="mobile" class="form-control" maxlength="11" required>
+                        </div>
+                    </div>
+
+                    <div class="form-section-title">বিস্তারিত অংশ</div>
+                    <div class="form-grid">
+                        <div class="form-group">
+                            <label>বাহিনী</label>
+                            <select id="force" class="form-control" required>
+                                <option value="সেনাবাহিনী">সেনাবাহিনী</option>
+                                <option value="নৌবাহিনীর">নৌবাহিনীর</option>
+                                <option value="বিমানবাহিনীর">বিমানবাহিনীর</option>
+                                <option value="বিজিবি">বিজিবি</option>
+                                <option value="পুলিশ">পুলিশ</option>
+                                <option value="আনসার বাহিনী">আনসার বাহিনী</option>
+                                <option value="সাধারণ">সাধারণ</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label>গন্তব্যস্থল</label>
+                            <select id="destination" class="form-control" required>
+                                <option value="সদর ব্যাটালিয়ন">সদর ব্যাটালিয়ন</option>
+                                <option value="সিপিএসসি">সিপিএসসি</option>
+                                <option value="সিপিসি - ১">সিপিসি - ১</option>
+                                <option value="ভোলা ক্যাম্প">ভোলা ক্যাম্প</option>
+                                <option value="সিপিসি - ৩">সিপিসি - ৩</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label>রেশন ইউনিট</label>
+                            <select id="ration" class="form-control" required>
+                                <option value="১ ইউনিট">১ ইউনিট</option>
+                                <option value="১.৫ ইউনিট">১.৫ ইউনিট</option>
+                                <option value="২ ইউনিট">২ ইউনিট</option>
+                                <option value="২.৫ ইউনিট">২.৫ ইউনিট</option>
+                                <option value="৩ ইউনিট">৩ ইউনিট</option>
+                                <option value="৩.৫ ইউনিট">৩.৫ ইউনিট</option>
+                                <option value="৪ ইউনিট">৪ ইউনিট</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label>NID নম্বর</label>
+                            <input type="text" id="nid" class="form-control" maxlength="10" required>
+                        </div>
+                        <div class="form-group">
+                            <label>জন্ম তারিখ</label>
+                            <input type="text" id="dob" class="form-control" placeholder="dd-mmm-yyyy" required>
+                        </div>
+                        <div class="form-group">
+                            <label>ধর্ম</label>
+                            <select id="religion" class="form-control" required>
+                                <option value="ইসলাম">ইসলাম</option>
+                                <option value="হিন্দুধর্ম">হিন্দুধর্ম</option>
+                                <option value="বৌদ্ধধর্ম">বৌদ্ধধর্ম</option>
+                                <option value="খ্রিস্টধর্ম">খ্রিস্টধর্ম</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <button type="submit" id="submit-btn-text" class="submit-btn">সংরক্ষণ করুন</button>
+                </form>
+            </div>
+
+            <!-- তথ্য তালিকা সেকশন -->
+            <div id="list-section" class="section-view">
+                <div class="section-header-flex">
+                    <h3>তথ্য তালিকা</h3>
+                    <div class="total-count-badge" id="list-total-count">মোট - <span>০</span> জন</div>
+                </div>
+                <div class="table-wrap"><table>
+                    <thead>
+                        <tr>
+                            <th>নং</th>
+                            <th>ব্যক্তিগত ID (ইউনিট ID)</th>
+                            <th>পদবী</th>
+                            <th>নাম</th>
+                            <th>বাহিনী</th>
+                            <th>গন্তব্যস্থল</th>
+                            <th>রেশন ইউনিট</th>
+                            <th>অ্যাকশন</th>
+                        </tr>
+                    </thead>
+                    <tbody id="admin-table-body"></tbody>
+                </table></div>
+            </div>
+
+            <!-- ডিলেট সদস্যদের তালিকা সেকশন -->
+            <div id="deleted-section" class="section-view">
+                <div class="section-header-flex">
+                    <h3>ডিলেট তালিকা</h3>
+                    <div class="total-count-badge" id="deleted-total-count">মোট - <span>০</span> জন</div>
+                </div>
+                <div class="table-wrap"><table>
+                    <thead>
+                        <tr>
+                            <th>নং</th>
+                            <th>ব্যক্তিগত ID</th>
+                            <th>নাম</th>
+                            <th>পদবী</th>
+                            <th>বাহিনী</th>
+                            <th>গন্তব্যস্থল</th>
+                            <th>অ্যাকশন</th>
+                        </tr>
+                    </thead>
+                    <tbody id="deleted-table-body"></tbody>
+                </table></div>
+            </div>
+
+            <!-- রেশন পরিবর্তনের তালিকা সেকশন -->
+            <div id="ration-log-section" class="section-view">
+                <div class="section-header-flex">
+                    <h3>রেশন পরিবর্তনের তালিকা</h3>
+                    <div class="total-count-badge" id="ration-total-count">মোট - <span>০</span> জন</div>
+                </div>
+                <div class="table-wrap"><table>
+                    <thead>
+                        <tr>
+                            <th>নং</th>
+                            <th>নাম ও আইডি</th>
+                            <th>মাস</th>
+                            <th>পুরাতন</th>
+                            <th>আপডেট</th>
+                            <th>অ্যাকশন</th>
+                        </tr>
+                    </thead>
+                    <tbody id="ration-log-body"></tbody>
+                </table></div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const allowedAdminEmails = ["masumbillah6778@gmail.com", "rationrab8@gmail.com"];
+        const firebaseDb = firebase.firestore();
+        const firebaseAuth = firebase.auth();
+        const googleProvider = new firebase.auth.GoogleAuthProvider();
+        googleProvider.setCustomParameters({prompt:'select_account'});
+        let currentAdminSection = 'dashboard';
+        let selectedGoogleEmail = '';
+        let loginDoc = null;
+        let loginStage = 'google';
+        let unsubscribeRecords = null, unsubscribeDeleted = null, unsubscribeRation = null, unsubscribeActiveMembers = null;
+
+        function safeText(v) { return String(v ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
+        async function hashText(value){ const data=new TextEncoder().encode(String(value)); const digest=await crypto.subtle.digest('SHA-256',data); return Array.from(new Uint8Array(digest)).map(b=>b.toString(16).padStart(2,'0')).join(''); }
+        function adminDocRef(){ return firebaseDb.collection('adminUsers').doc(firebaseAuth.currentUser.uid); }
+        function showLoginError(msg){ const e=document.getElementById('loginErrorMsg'); e.style.display='block'; e.innerText=msg; }
+        function clearLoginError(){ const e=document.getElementById('loginErrorMsg'); e.style.display='none'; e.innerText=''; }
+        function isAllowedEmail(email){ return allowedAdminEmails.includes(String(email||'').toLowerCase()); }
+
+        async function startGoogleLogin(){
+            clearLoginError();
+            try{
+                let result;
+                // Use popup first on every device so the selected Google account
+                // stays in the same page. Redirect is only a fallback when popup
+                // is unavailable/blocked.
+                try{
+                    result=await firebaseAuth.signInWithPopup(googleProvider);
+                }catch(popupErr){
+                    const fallbackCodes=['auth/popup-blocked','auth/operation-not-supported-in-this-environment','auth/web-storage-unsupported'];
+                    if(fallbackCodes.includes(popupErr && popupErr.code)){
+                        await firebaseAuth.signInWithRedirect(googleProvider);
+                        return;
+                    }
+                    throw popupErr;
+                }
+                const user=result.user;
+                const email=(user.email||'').toLowerCase();
+                if(!isAllowedEmail(email)){
+                    await firebaseAuth.signOut();
+                    selectedGoogleEmail='';
+                    showLoginError('এই Gmailটি SRB-8 Admin Panel-এর জন্য অনুমোদিত নয়।');
+                    return;
+                }
+                selectedGoogleEmail=email;
+                document.getElementById('selectedAccountEmail').innerText=email;
+                document.getElementById('selectedAccountBox').style.display='block';
+                document.getElementById('googleSelectBtn').style.display='none';
+                document.getElementById('personalPasswordForm').style.display='block';
+                document.getElementById('changeGoogleAccountBtn').style.display='block';
+                const snap=await adminDocRef().get();
+                loginDoc=snap.exists?snap.data():null;
+                const pass=document.getElementById('adminPasswordInput'), confirm=document.getElementById('adminPasswordConfirm'), recovery=document.getElementById('adminRecoveryInput'), reset=document.getElementById('resetPasswordBtn');
+                if(loginDoc && loginDoc.passwordHash){
+                    loginStage='password'; pass.style.display='block'; confirm.style.display='none'; recovery.style.display='none'; reset.style.display='block'; document.getElementById('loginSubmitBtn').innerText='লগইন করুন'; document.getElementById('loginStepText').innerText='এই Gmail-এর ব্যক্তিগত পাসওয়ার্ড দিন';
+                }else{
+                    loginStage='setup'; pass.style.display='block'; confirm.style.display='block'; recovery.style.display='block'; reset.style.display='none'; document.getElementById('loginSubmitBtn').innerText='পাসওয়ার্ড সেট করে প্রবেশ'; document.getElementById('loginStepText').innerText='প্রথমবার প্রবেশের জন্য ব্যক্তিগত পাসওয়ার্ড সেট করুন';
+                }
+            }catch(err){
+                if(err && err.code==='auth/popup-closed-by-user') return;
+                showLoginError('Google Login সম্পন্ন হয়নি। আবার চেষ্টা করুন।');
+            }
+        }
+
+        async function handlePersonalPassword(e){
+            e.preventDefault(); clearLoginError();
+            const user=firebaseAuth.currentUser;
+            if(!user || !isAllowedEmail(user.email)){showLoginError('অনুমোদিত Gmail নির্বাচন করুন।');return;}
+            const pass=document.getElementById('adminPasswordInput').value;
+            const confirm=document.getElementById('adminPasswordConfirm').value;
+            const recovery=document.getElementById('adminRecoveryInput').value.trim();
+            if(loginStage==='setup'){
+                if(pass.length<6){showLoginError('পাসওয়ার্ড কমপক্ষে ৬ অক্ষরের হতে হবে।');return;}
+                if(pass!==confirm){showLoginError('দুটি পাসওয়ার্ড একই নয়।');return;}
+                if(!/^\d{6}$/.test(recovery)){showLoginError('রিকভারি কোড ৬ সংখ্যার হতে হবে।');return;}
+                const passwordHash=await hashText(pass), recoveryHash=await hashText(recovery);
+                await adminDocRef().set({email:user.email.toLowerCase(),passwordHash,recoveryHash,createdAt:firebase.firestore.FieldValue.serverTimestamp(),updatedAt:firebase.firestore.FieldValue.serverTimestamp()},{merge:true});
+                loginDoc={passwordHash,recoveryHash};
+                completeLogin();
+                return;
+            }
+            if(!loginDoc || !loginDoc.passwordHash){showLoginError('এই Gmail-এর ব্যক্তিগত পাসওয়ার্ড সেট করা নেই।');return;}
+            const ok=(await hashText(pass))===loginDoc.passwordHash;
+            if(!ok){showLoginError('পাসওয়ার্ড সঠিক নয়। Dashboard-এ প্রবেশ করা যাবে না।');return;}
+            completeLogin();
+        }
+
+        function completeLogin(){
+            sessionStorage.setItem('srb8_app_unlocked','true');
+            updateAuthButton();
+            document.getElementById('login-overlay').style.display='none';
+            loadDashboard(); subscribeOnlineData();
+        }
+        function resetLoginUI(){
+            selectedGoogleEmail=''; loginDoc=null; loginStage='google';
+            document.getElementById('googleSelectBtn').style.display='block';
+            document.getElementById('selectedAccountBox').style.display='none';
+            document.getElementById('personalPasswordForm').style.display='none';
+            document.getElementById('resetPasswordBtn').style.display='none';
+            document.getElementById('changeGoogleAccountBtn').style.display='none';
+            document.getElementById('adminPasswordInput').value=''; document.getElementById('adminPasswordConfirm').value=''; document.getElementById('adminRecoveryInput').value='';
+            clearLoginError(); document.getElementById('loginStepText').innerText='Google Account নির্বাচন করুন';
+        }
+        async function changeGoogleAccount(){ await firebaseAuth.signOut(); sessionStorage.removeItem('srb8_app_unlocked'); resetLoginUI(); document.getElementById('login-overlay').style.display='flex'; updateAuthButton(); }
+        async function handleAdminAuth(){
+            if(firebaseAuth.currentUser && sessionStorage.getItem('srb8_app_unlocked')==='true'){ await logoutOnline(); }
+            else { document.getElementById('login-overlay').style.display='flex'; resetLoginUI(); }
+        }
+        async function logoutOnline(){
+            sessionStorage.removeItem('srb8_app_unlocked');
+            if(unsubscribeRecords) unsubscribeRecords(); if(unsubscribeDeleted) unsubscribeDeleted(); if(unsubscribeRation) unsubscribeRation(); if(unsubscribeActiveMembers) unsubscribeActiveMembers();
+            unsubscribeRecords=unsubscribeDeleted=unsubscribeRation=unsubscribeActiveMembers=null;
+            await firebaseAuth.signOut(); resetLoginUI(); updateAuthButton(); document.getElementById('login-overlay').style.display='flex';
+        }
+        function updateAuthButton(){
+            const btn=document.getElementById('adminAuthBtn'), box=document.getElementById('active-admin-email');
+            const user=firebaseAuth.currentUser, unlocked=sessionStorage.getItem('srb8_app_unlocked')==='true';
+            if(user && unlocked){box.style.display='block';box.innerText='🟢 '+user.email+' (Active)';btn.innerText='🚪 লগআউট';btn.className='logout-btn';}
+            else{box.style.display='none';btn.innerText='🔐 লগইন';btn.className='login-btn';}
+        }
+        document.getElementById('resetPasswordBtn').onclick=async function(){
+            const user=firebaseAuth.currentUser; if(!user)return;
+            const code=prompt('এই Gmail-এর ৬ সংখ্যার রিকভারি কোড দিন:'); if(code===null)return;
+            const snap=await adminDocRef().get(); const data=snap.exists?snap.data():null;
+            if(!data || (await hashText(code))!==data.recoveryHash){alert('রিকভারি কোড সঠিক নয়।');return;}
+            await adminDocRef().set({passwordHash:firebase.firestore.FieldValue.delete(),recoveryHash:firebase.firestore.FieldValue.delete(),updatedAt:firebase.firestore.FieldValue.serverTimestamp()},{merge:true});
+            alert('পাসওয়ার্ড রিসেট হয়েছে। এখন নতুন ব্যক্তিগত পাসওয়ার্ড ও রিকভারি কোড সেট করুন।');
+            await firebaseAuth.signOut(); sessionStorage.removeItem('srb8_app_unlocked'); resetLoginUI(); updateAuthButton();
+        };
+
+        // Complete a redirect login if the popup fallback was used.
+        firebaseAuth.getRedirectResult().then(async result=>{
+            if(!result || !result.user) return;
+            const user=result.user;
+            const email=(user.email||'').toLowerCase();
+            if(!isAllowedEmail(email)){
+                await firebaseAuth.signOut();
+                resetLoginUI();
+                showLoginError('এই Gmailটি SRB-8 Admin Panel-এর জন্য অনুমোদিত নয়।');
+                return;
+            }
+            selectedGoogleEmail=email;
+            document.getElementById('selectedAccountEmail').innerText=email;
+            document.getElementById('selectedAccountBox').style.display='block';
+            document.getElementById('googleSelectBtn').style.display='none';
+            document.getElementById('personalPasswordForm').style.display='block';
+            document.getElementById('changeGoogleAccountBtn').style.display='block';
+            const snap=await adminDocRef().get();
+            loginDoc=snap.exists?snap.data():null;
+            const pass=document.getElementById('adminPasswordInput'), confirm=document.getElementById('adminPasswordConfirm'), recovery=document.getElementById('adminRecoveryInput'), reset=document.getElementById('resetPasswordBtn');
+            if(loginDoc && loginDoc.passwordHash){
+                loginStage='password'; pass.style.display='block'; confirm.style.display='none'; recovery.style.display='none'; reset.style.display='block'; document.getElementById('loginSubmitBtn').innerText='লগইন করুন'; document.getElementById('loginStepText').innerText='এই Gmail-এর ব্যক্তিগত পাসওয়ার্ড দিন';
+            }else{
+                loginStage='setup'; pass.style.display='block'; confirm.style.display='block'; recovery.style.display='block'; reset.style.display='none'; document.getElementById('loginSubmitBtn').innerText='পাসওয়ার্ড সেট করে প্রবেশ'; document.getElementById('loginStepText').innerText='প্রথমবার প্রবেশের জন্য ব্যক্তিগত পাসওয়ার্ড সেট করুন';
+            }
+        }).catch(err=>{
+            if(err && err.code!=='auth/no-auth-event') showLoginError('Google Login সম্পন্ন হয়নি। আবার চেষ্টা করুন।');
+        });
+
+        firebaseAuth.onAuthStateChanged(async user=>{
+            updateAuthButton();
+            if(!user){ if(document.getElementById('login-overlay')) document.getElementById('login-overlay').style.display='flex'; return; }
+            const email=(user.email||'').toLowerCase();
+            if(!isAllowedEmail(email)){ await firebaseAuth.signOut(); resetLoginUI(); return; }
+            if(sessionStorage.getItem('srb8_app_unlocked')==='true'){
+                document.getElementById('login-overlay').style.display='none'; loadDashboard(); subscribeOnlineData();
+            }else{
+                selectedGoogleEmail=email; document.getElementById('selectedAccountEmail').innerText=email; document.getElementById('selectedAccountBox').style.display='block'; document.getElementById('googleSelectBtn').style.display='none'; document.getElementById('personalPasswordForm').style.display='block'; document.getElementById('changeGoogleAccountBtn').style.display='block';
+                const snap=await adminDocRef().get(); loginDoc=snap.exists?snap.data():null;
+                const pass=document.getElementById('adminPasswordInput'),confirm=document.getElementById('adminPasswordConfirm'),recovery=document.getElementById('adminRecoveryInput');
+                if(loginDoc && loginDoc.passwordHash){loginStage='password';pass.style.display='block';confirm.style.display='none';recovery.style.display='none';document.getElementById('resetPasswordBtn').style.display='block';document.getElementById('loginSubmitBtn').innerText='লগইন করুন';document.getElementById('loginStepText').innerText='এই Gmail-এর ব্যক্তিগত পাসওয়ার্ড দিন';}
+                else{loginStage='setup';pass.style.display='block';confirm.style.display='block';recovery.style.display='block';document.getElementById('resetPasswordBtn').style.display='none';document.getElementById('loginSubmitBtn').innerText='পাসওয়ার্ড সেট করে প্রবেশ';document.getElementById('loginStepText').innerText='প্রথমবার প্রবেশের জন্য ব্যক্তিগত পাসওয়ার্ড সেট করুন';}
+            }
+        });
+
+        function formatRationDisplay(rationStr){ if(!rationStr) return ''; let parts=String(rationStr).split(' '); return `<span style="font-weight:bold;color:red;">${safeText(parts[0])}</span> ${safeText(parts[1]||'ইউনিট')}`; }
+        function toggleSidebar(){ document.getElementById('sidebar').classList.toggle('open'); }
+        function switchSection(sectionId,btnElement){
+            currentAdminSection=sectionId; document.querySelectorAll('.section-view').forEach(s=>s.classList.remove('active')); document.querySelectorAll('.menu-btn').forEach(b=>b.classList.remove('active')); document.getElementById(sectionId+'-section').classList.add('active'); if(btnElement) btnElement.classList.add('active');
+            const search=document.getElementById('admin-search-container');
+            if(sectionId==='dashboard'){document.getElementById('admin-view-title').innerText='SRB-8 এডমিন প্যানেল';search.style.display='none';loadDashboard();}
+            else if(sectionId==='add'){document.getElementById('admin-view-title').innerText=document.getElementById('form-title').innerText;search.style.display='none';}
+            else if(sectionId==='list'){document.getElementById('admin-view-title').innerText='তথ্য তালিকা';search.style.display='block';loadAdminTable();}
+            else if(sectionId==='deleted'){document.getElementById('admin-view-title').innerText='ডিলেট তালিকা';search.style.display='block';loadDeletedTable();}
+            else if(sectionId==='ration-log'){document.getElementById('admin-view-title').innerText='রেশন লগ';search.style.display='block';loadRationLogTable();}
+            else if(sectionId==='settings'){document.getElementById('admin-view-title').innerText='Settings';search.style.display='none';}
+            if(window.innerWidth<=768){document.getElementById('sidebar').classList.remove('open');}
+        }
+        function getData(){return window.__srbRecords||[]}
+        function getDeletedData(){return window.__srbDeleted||[]}
+        function getRationLogData(){return window.__srbRation||[]}
+        function loadDashboard(){const records=getData(),forces=["সেনাবাহিনী","নৌবাহিনীর","বিমানবাহিনীর","বিজিবি","পুলিশ","আনসার বাহিনী","সাধারণ"],c=document.getElementById('dashboard-stats');c.innerHTML='';c.innerHTML+=`<div class="stat-card"><h4>সক্রিয় মোট সংখ্যা</h4><div class="stat-number">${records.length}</div></div>`;forces.forEach(f=>{let count=records.filter(r=>r.force===f).length;c.innerHTML+=`<div class="stat-card"><h4>${safeText(f)}</h4><div class="stat-number">${count}</div></div>`});c.innerHTML+=`<div class="stat-card yellow-card"><h4>এক্টিভ সদস্য</h4><div class="stat-number">${(window.__srbActiveMembers||[]).length}</div></div>`;}
+        function renderCurrentAdminData(){
+            if(currentAdminSection==='dashboard') loadDashboard();
+            else if(currentAdminSection==='list') loadAdminTable(document.getElementById('adminSearchInput').value);
+            else if(currentAdminSection==='deleted') loadDeletedTable(document.getElementById('adminSearchInput').value);
+            else if(currentAdminSection==='ration-log') loadRationLogTable(document.getElementById('adminSearchInput').value);
+        }
+        async function loadAdminDataOnce(){
+            try{
+                const [recordsSnap,deletedSnap,rationSnap]=await Promise.all([
+                    firebaseDb.collection('records').get(),
+                    firebaseDb.collection('deletedRecords').get(),
+                    firebaseDb.collection('rationLogs').get()
+                ]);
+                window.__srbRecords=recordsSnap.docs.map(d=>({id:d.id,...d.data()}));
+                window.__srbDeleted=deletedSnap.docs.map(d=>({id:d.id,...d.data()}));
+                window.__srbRation=rationSnap.docs.map(d=>({id:d.id,...d.data()}));
+                renderCurrentAdminData();
+                return true;
+            }catch(e){
+                console.error('Admin data load error:',e);
+                alert('এডমিনের তথ্য লোড করা যায়নি। Internet/Firebase Login/Firestore Rules পরীক্ষা করুন।');
+                return false;
+            }
+        }
+        function subscribeOnlineData(){
+            if(unsubscribeRecords)unsubscribeRecords();if(unsubscribeDeleted)unsubscribeDeleted();if(unsubscribeRation)unsubscribeRation();if(unsubscribeActiveMembers)unsubscribeActiveMembers();
+            window.__srbRecords=window.__srbRecords||[];window.__srbDeleted=window.__srbDeleted||[];window.__srbRation=window.__srbRation||[];window.__srbActiveMembers=window.__srbActiveMembers||[];
+            loadAdminDataOnce();
+            unsubscribeRecords=firebaseDb.collection('records').onSnapshot(s=>{window.__srbRecords=s.docs.map(d=>({id:d.id,...d.data()}));renderCurrentAdminData();},e=>console.error('records snapshot error:',e));
+            unsubscribeDeleted=firebaseDb.collection('deletedRecords').onSnapshot(s=>{window.__srbDeleted=s.docs.map(d=>({id:d.id,...d.data()}));if(currentAdminSection==='deleted')loadDeletedTable(document.getElementById('adminSearchInput').value);},e=>console.error('deleted snapshot error:',e));
+            unsubscribeRation=firebaseDb.collection('rationLogs').onSnapshot(s=>{window.__srbRation=s.docs.map(d=>({id:d.id,...d.data()}));if(currentAdminSection==='ration-log')loadRationLogTable(document.getElementById('adminSearchInput').value);},e=>console.error('ration snapshot error:',e));
+            unsubscribeActiveMembers=firebaseDb.collection('activeMembers').onSnapshot(s=>{window.__srbActiveMembers=s.docs.map(d=>({id:d.id,...d.data()}));if(currentAdminSection==='dashboard')loadDashboard();},e=>console.error('activeMembers snapshot error:',e));
+        }
+        function normalizeRecord(r){const x={...r};delete x.id;return x;}
+        function validateRecord(record,editId){if(!/^\d+$/.test(record.mobile)||record.mobile.length!==11)return 'মোবাইল নম্বর ১১ সংখ্যার হতে হবে।';if(!/^\d+$/.test(record.nid)||record.nid.length<10)return 'NID নম্বর কমপক্ষে ১০ সংখ্যার হতে হবে।';const pid=String(record.p_id||'').trim().toLowerCase();const dup=getData().find(r=>r.id!==editId&&String(r.p_id||'').trim().toLowerCase()===pid);if(dup)return 'এই ব্যক্তিগত ID আগে থেকেই আছে।';return '';}
+        async function handleFormSubmit(e){e.preventDefault();const record={p_id:document.getElementById('p_id').value.trim(),u_id:document.getElementById('u_id').value.trim(),rank:document.getElementById('rank').value.trim(),name:document.getElementById('name').value.trim(),duty:document.getElementById('duty').value.trim(),mobile:document.getElementById('mobile').value.trim(),force:document.getElementById('force').value,destination:document.getElementById('destination').value,ration:document.getElementById('ration').value,nid:document.getElementById('nid').value.trim(),dob:document.getElementById('dob').value.trim(),religion:document.getElementById('religion').value};const editId=document.getElementById('edit_index').value.trim();const error=validateRecord(record,editId);if(error){alert(error);return;}try{if(editId){const old=getData().find(r=>r.id===editId);if(!old){alert('এডিট করা তথ্যটি পাওয়া যায়নি।');return;}if(old.ration!==record.ration){const now=new Date();await firebaseDb.collection('rationLogs').add({name:record.name,p_id:record.p_id,month:getCurrentMonthName(),year:now.getFullYear(),changed_at:now.toLocaleString('bn-BD'),old_ration:old.ration,new_ration:record.ration,createdAt:firebase.firestore.FieldValue.serverTimestamp()});}await firebaseDb.collection('records').doc(editId).set(record);alert('আপডেট হয়েছে!');}else{await firebaseDb.collection('records').add(record);alert('সফলভাবে যুক্ত হয়েছে! নতুন তথ্য এন্ট্রির জন্য ফর্ম প্রস্তুত।');}document.getElementById('biodata-form').reset();document.getElementById('edit_index').value='';document.getElementById('form-title').innerText='নতুন তথ্য এন্ট্রি ফর্ম';document.getElementById('submit-btn-text').innerText='সংরক্ষণ করুন';if(editId)switchSection('list',document.querySelectorAll('.menu-btn')[2]);else document.getElementById('p_id').focus();}catch(err){alert('অনলাইনে তথ্য সংরক্ষণ করা যায়নি। Firestore Rules/Connection পরীক্ষা করুন।');}}
+        function loadAdminTable(searchQuery=''){const records=getData(),tbody=document.getElementById('admin-table-body');tbody.innerHTML='';let filtered=records;if(searchQuery.trim()!==''){const q=searchQuery.toLowerCase();filtered=records.filter(r=>[r.p_id,r.name,r.rank,r.u_id,r.mobile,r.destination,r.force].some(v=>String(v||'').toLowerCase().includes(q)))}document.getElementById('list-total-count').innerHTML=`মোট - <span>${filtered.length}</span> জন`;if(!filtered.length){tbody.innerHTML='<tr><td colspan="8" style="text-align:center;color:#777;">কোনো তথ্য নেই।</td></tr>';return}filtered.forEach((r,index)=>{tbody.innerHTML+=`<tr><td>${index+1}</td><td><b>${safeText(r.p_id)}</b><br><small style="color:blue;">${safeText(r.u_id)}</small></td><td>${safeText(r.rank)}</td><td>${safeText(r.name)}</td><td>${safeText(r.force)}</td><td>${safeText(r.destination)}</td><td>${formatRationDisplay(r.ration)}</td><td><div class="action-btns"><button class="btn-edit" onclick="editRecord('${r.id}')">এডিট</button><button class="btn-delete" onclick="deleteRecord('${r.id}')">ডিলেট</button></div></td></tr>`})}
+        function loadDeletedTable(searchQuery=''){const deletedList=getDeletedData(),tbody=document.getElementById('deleted-table-body');tbody.innerHTML='';let filtered=deletedList;if(searchQuery.trim()!==''){const q=searchQuery.toLowerCase();filtered=deletedList.filter(r=>[r.p_id,r.name,r.rank,r.u_id].some(v=>String(v||'').toLowerCase().includes(q)))}document.getElementById('deleted-total-count').innerHTML=`মোট - <span>${filtered.length}</span> জন`;if(!filtered.length){tbody.innerHTML='<tr><td colspan="7" style="text-align:center;color:#777;">কোনো তথ্য নেই।</td></tr>';return}filtered.forEach((r,index)=>{tbody.innerHTML+=`<tr><td>${index+1}</td><td><b>${safeText(r.p_id)}</b></td><td>${safeText(r.name)}</td><td>${safeText(r.rank)}</td><td>${safeText(r.force)}</td><td>${safeText(r.destination)}</td><td><div class="action-btns"><button class="btn-edit" onclick="restoreRecord('${r.id}')">ফেরত আনুন</button><button class="btn-delete" onclick="permanentlyDeleteRecord('${r.id}')">মুছে ফেলুন</button></div></td></tr>`})}
+        function loadRationLogTable(searchQuery=''){const logs=getRationLogData(),tbody=document.getElementById('ration-log-body');tbody.innerHTML='';let filtered=logs;if(searchQuery.trim()!==''){const q=searchQuery.toLowerCase();filtered=logs.filter(l=>[l.name,l.p_id,l.month,l.year,l.changed_at,l.old_ration,l.new_ration].some(v=>String(v||'').toLowerCase().includes(q)))}document.getElementById('ration-total-count').innerHTML=`মোট - <span>${filtered.length}</span> জন`;if(!filtered.length){tbody.innerHTML='<tr><td colspan="6" style="text-align:center;color:#777;">কোনো রেকর্ড নেই।</td></tr>';return}filtered.forEach((l,index)=>{tbody.innerHTML+=`<tr><td>${index+1}</td><td>${safeText(l.name)}<br><small>(${safeText(l.p_id)})</small></td><td><b>${safeText(l.month)} - ${safeText(l.year||'')}</b></td><td>${formatRationDisplay(l.old_ration)}</td><td>${formatRationDisplay(l.new_ration)}</td><td><button class="btn-delete" onclick="deleteRationLog('${l.id}')">ডিলেট</button></td></tr>`})}
+        function filterAdminTable(){const q=document.getElementById('adminSearchInput').value;if(currentAdminSection==='list')loadAdminTable(q);if(currentAdminSection==='deleted')loadDeletedTable(q);if(currentAdminSection==='ration-log')loadRationLogTable(q)}
+        function editRecord(id){const r=getData().find(x=>x.id===id);if(!r)return;['p_id','u_id','rank','name','duty','mobile','force','destination','ration','nid','dob','religion'].forEach(k=>document.getElementById(k).value=r[k]||'');document.getElementById('edit_index').value=id;document.getElementById('form-title').innerText='তথ্য আপডেট ফর্ম';document.getElementById('submit-btn-text').innerText='আপডেট করুন';switchSection('add',document.querySelectorAll('.menu-btn')[1])}
+        async function deleteRecord(id){if(!confirm('ডিলেট করতে চান?'))return;const r=getData().find(x=>x.id===id);if(!r)return;try{const batch=firebaseDb.batch();batch.set(firebaseDb.collection('deletedRecords').doc(id),{...normalizeRecord(r),deleted_at:new Date().toLocaleString('bn-BD')});batch.delete(firebaseDb.collection('records').doc(id));await batch.commit();}catch(e){alert('ডিলেট করা যায়নি। অনলাইন সংযোগ/Rules পরীক্ষা করুন।')}}
+        async function restoreRecord(id){if(!confirm('এই তথ্যটি আবার সক্রিয় তালিকায় ফিরিয়ে আনতে চান?'))return;const r=getDeletedData().find(x=>x.id===id);if(!r){alert('ডিলেট করা তথ্যটি পাওয়া যায়নি।');return;}const duplicate=getData().find(x=>String(x.p_id||'').trim().toLowerCase()===String(r.p_id||'').trim().toLowerCase());if(duplicate){alert('এই ব্যক্তিগত ID বর্তমানে সক্রিয় তালিকায় আছে। তাই একই ID দিয়ে তথ্যটি ফেরত আনা যাচ্ছে না।');return;}try{const clean=normalizeRecord(r);delete clean.deleted_at;const batch=firebaseDb.batch();batch.set(firebaseDb.collection('records').doc(id),clean);batch.delete(firebaseDb.collection('deletedRecords').doc(id));await batch.commit();alert('তথ্যটি সফলভাবে ফেরত আনা হয়েছে।');}catch(e){alert('তথ্যটি ফেরত আনা যায়নি।')}}
+        async function permanentlyDeleteRecord(id){if(!confirm('স্থায়ীভাবে মুছে ফেলতে চান?'))return;try{await firebaseDb.collection('deletedRecords').doc(id).delete();}catch(e){alert('স্থায়ীভাবে মুছে ফেলা যায়নি।')}}
+        async function deleteRationLog(id){if(!confirm('ডিলেট করতে চান?'))return;try{await firebaseDb.collection('rationLogs').doc(id).delete();}catch(e){alert('রেশন লগ ডিলেট করা যায়নি।')}}
+        function getCurrentMonthName(){return ["জানুয়ারি","ফেব্রুয়ারি","মার্চ","এপ্রিল","মে","জুন","জুলাই","আগস্ট","সেপ্টেম্বর","অক্টোবর","নভেম্বর","ডিসেম্বর"][new Date().getMonth()]}
+        window.addEventListener('load',()=>{document.getElementById('login-overlay').style.display='flex';updateAuthButton();});
+    </script>
+</body>
+</html>
