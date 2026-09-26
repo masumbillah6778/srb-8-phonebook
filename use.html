@@ -1,0 +1,1080 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SRB-8 - ইউজার প্যানেল</title>
+
+    <style>
+        :root {
+            --primary-green: #007626;
+            --accent-red: #d32f2f;
+            --bg-gray: #f4f6f8;
+            --card-bg: #ffffff;
+            --text-dark: #333333;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'SolaimanLipi', Arial, sans-serif;
+        }
+
+        body {
+            background-color: var(--bg-gray);
+            color: var(--text-dark);
+            display: flex;
+            height: 100vh;
+            overflow: hidden;
+        }
+
+        .active-user-email {
+            margin-top: auto;
+            padding: 8px 7px;
+            border-radius: 5px;
+            background: rgba(255,255,255,.14);
+            border: 1px solid rgba(255,255,255,.25);
+            color: #fff;
+            font-size: .72rem;
+            font-weight: bold;
+            text-align: center;
+            white-space: normal;
+            overflow-wrap: anywhere;
+            line-height: 1.25;
+        }
+
+        .sidebar {
+            width: 0;
+            background-color: var(--primary-green);
+            color: white;
+            display: flex;
+            flex-direction: column;
+            padding: 10px 0;
+            gap: 8px;
+            overflow: hidden;
+            box-shadow: 2px 0 5px rgba(0,0,0,0.1);
+            transition: width 0.3s ease, padding 0.3s ease;
+            white-space: nowrap;
+        }
+
+        .sidebar.open {
+            width: 250px;
+            padding: 12px;
+            overflow-y: auto;
+        }
+
+        .sidebar-header {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding-bottom: 10px;
+            border-bottom: 1px solid rgba(255,255,255,0.2);
+            margin-bottom: 5px;
+        }
+
+        .sidebar-header h2 {
+            font-size: 1.1rem;
+            color: #ffeb3b;
+        }
+
+        .menu-item {
+            background: white;
+            color: var(--text-dark);
+            padding: 10px 12px;
+            border-radius: 6px;
+            cursor: pointer;
+            text-align: left;
+            font-weight: bold;
+            border: none;
+            width: 100%;
+            transition: 0.2s;
+            font-size: 0.9rem;
+            box-shadow: 0 1px 2px rgba(0,0,0,0.1);
+        }
+
+        .menu-item:hover,
+        .menu-item.active {
+            background-color: #e8f5e9;
+            color: var(--primary-green);
+            padding-left: 15px;
+        }
+
+        .main-content {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+
+        .top-bar {
+            background-color: var(--accent-red);
+            color: white;
+            padding: 8px 12px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            gap: 10px;
+        }
+
+        .top-bar-left {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .toggle-sidebar-btn {
+            background: none;
+            border: none;
+            color: white;
+            font-size: 1.3rem;
+            cursor: pointer;
+        }
+
+        .top-bar h1 {
+            font-size: 1rem;
+        }
+
+        .search-box {
+            padding: 6px 10px;
+            border-radius: 4px;
+            border: none;
+            width: 170px;
+            font-size: 0.85rem;
+        }
+
+        .content-body {
+            flex: 1;
+            padding: 10px;
+            overflow: auto;
+        }
+
+        .view-container {
+            display: none;
+            min-width: 550px;
+        }
+
+        .view-container.active {
+            display: block;
+        }
+
+        .table-header-flex {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+            background: white;
+            padding: 10px 12px;
+            border-radius: 6px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+        }
+
+        .table-header-flex h3 {
+            color: var(--accent-red);
+            font-size: 1.1rem;
+            margin: 0;
+        }
+
+        .total-count-badge {
+            font-weight: bold;
+            font-size: 0.9rem;
+            color: var(--text-dark);
+        }
+
+        .total-count-badge span {
+            color: var(--accent-red);
+            font-weight: bold;
+        }
+
+        .table-container {
+            background: white;
+            border-radius: 6px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+            overflow-x: auto;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            white-space: nowrap;
+        }
+
+        th,
+        td {
+            border: 1px solid #333;
+            padding: 8px 10px;
+            text-align: center;
+            font-size: 0.85rem;
+        }
+
+        th {
+            background-color: #e0e0e0;
+            color: #000;
+            font-weight: bold;
+        }
+
+        tr:nth-child(even) {
+            background-color: #fafafa;
+        }
+
+        .btn-details {
+            background-color: #007626;
+            color: white;
+            border: none;
+            padding: 4px 10px;
+            border-radius: 3px;
+            font-weight: bold;
+            cursor: pointer;
+            font-size: 0.8rem;
+        }
+
+        .call-icon-btn {
+            background-color: #e3f2fd;
+            color: #0d47a1;
+            border: 1px solid #90caf9;
+            padding: 4px 8px;
+            border-radius: 3px;
+            text-decoration: none;
+            font-weight: bold;
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            font-size: 0.8rem;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+            gap: 10px;
+            margin-top: 5px;
+        }
+
+        .stat-card {
+            background: white;
+            border: 1px solid #ddd;
+            padding: 12px;
+            border-radius: 6px;
+            text-align: center;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+        }
+
+        .stat-card h4 {
+            color: var(--primary-green);
+            margin-bottom: 6px;
+            font-size: 0.9rem;
+        }
+
+        .stat-number {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: var(--accent-red);
+        }
+
+        .modal-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.5);
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+            padding: 10px;
+        }
+
+        .modal-content {
+            background: white;
+            width: 450px;
+            max-width: 100%;
+            border-radius: 6px;
+            padding: 15px;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+            max-height: 90vh;
+            overflow-y: auto;
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 2px solid var(--primary-green);
+            padding-bottom: 8px;
+            margin-bottom: 10px;
+        }
+
+        .modal-header h3 {
+            color: var(--primary-green);
+            font-size: 1.1rem;
+        }
+
+        .close-btn {
+            background: var(--accent-red);
+            color: white;
+            border: none;
+            width: 25px;
+            height: 25px;
+            border-radius: 50%;
+            font-weight: bold;
+            cursor: pointer;
+        }
+
+        .modal-body p {
+            padding: 6px 0;
+            border-bottom: 1px solid #eee;
+            font-size: 0.9rem;
+        }
+
+        @media (max-width: 700px) {
+            body {
+                height: 100dvh;
+            }
+
+            .sidebar.open {
+                position: fixed;
+                left: 0;
+                top: 0;
+                bottom: 0;
+                z-index: 9000;
+                width: min(250px,82vw);
+            }
+
+            .main-content {
+                width: 100%;
+                min-width: 0;
+            }
+
+            .top-bar {
+                position: sticky;
+                top: 0;
+                z-index: 100;
+            }
+
+            .search-box {
+                width: 135px;
+                max-width: 38vw;
+            }
+
+            .content-body {
+                padding: 7px;
+            }
+
+            .view-container {
+                min-width: 0;
+                width: 100%;
+            }
+
+            .table-container {
+                max-width: 100%;
+            }
+
+            table {
+                min-width: 720px;
+            }
+
+            .modal-content {
+                width: calc(100vw - 20px);
+            }
+        }
+    </style>
+
+    <script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-firestore-compat.js"></script>
+    <script src="firebase-config.js"></script>
+</head>
+
+<body>
+
+    <div class="sidebar" id="sidebar">
+        <div class="sidebar-header">
+            <span style="font-size: 1.3rem;">😊</span>
+
+            <div>
+                <h2>SRB - 8</h2>
+                <small style="color: #ffcdd2;">[ ইউজার প্যানেল ]</small>
+            </div>
+        </div>
+
+        <button class="menu-item active"
+                onclick="switchUserTab('dashboard', this)">
+            📊 ড্যাশবোর্ড
+        </button>
+
+        <button class="menu-item"
+                onclick="switchUserTab('সদর ব্যাটালিয়ন', this)">
+            🏢 সদর ব্যাটালিয়ন
+        </button>
+
+        <button class="menu-item"
+                onclick="switchUserTab('সিপিএসসি', this)">
+            🛡️ সিপিএসসি
+        </button>
+
+        <button class="menu-item"
+                onclick="switchUserTab('সিপিসি - ১', this)">
+            📍 সিপিসি - ১
+        </button>
+
+        <button class="menu-item"
+                onclick="switchUserTab('ভোলা ক্যাম্প', this)">
+            🏕️ ভোলা ক্যাম্প
+        </button>
+
+        <button class="menu-item"
+                onclick="switchUserTab('সিপিসি - ৩', this)">
+            📍 সিপিসি - ৩
+        </button>
+
+        <div id="active-user-email"
+             class="active-user-email"
+             style="display:none;">
+        </div>
+    </div>
+
+    <div class="main-content">
+
+        <div class="top-bar">
+
+            <div class="top-bar-left">
+
+                <button class="toggle-sidebar-btn"
+                        onclick="toggleSidebar()">
+                    ☰
+                </button>
+
+                <h1 id="view-title">ড্যাশবোর্ড</h1>
+
+            </div>
+
+            <div id="search-container" style="display: none;">
+
+                <input type="text"
+                       id="searchInput"
+                       class="search-box"
+                       placeholder="🔍 খুঁজুন..."
+                       onkeyup="filterTable">
+
+            </div>
+
+        </div>
+
+        <div class="content-body">
+
+            <div id="dashboard-view"
+                 class="view-container active">
+
+                <div class="stats-grid"
+                     id="user-dashboard-stats">
+                </div>
+
+            </div>
+
+            <div id="table-view"
+                 class="view-container">
+
+                <div class="table-header-flex">
+
+                    <h3 id="table-section-title">
+                        তালিকা
+                    </h3>
+
+                    <div class="total-count-badge"
+                         id="user-table-total-count">
+                        মোট - <span>০</span> জন
+                    </div>
+
+                </div>
+
+                <div class="table-container">
+
+                    <table>
+
+                        <thead>
+
+                            <tr>
+                                <th>নং</th>
+                                <th>ব্যক্তিগত ID</th>
+                                <th>পদবী</th>
+                                <th>নাম</th>
+                                <th>বিস্তারিত</th>
+                                <th>মোবাইল</th>
+                            </tr>
+
+                        </thead>
+
+                        <tbody id="user-table-body"></tbody>
+
+                    </table>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+    <div id="detailsModal"
+         class="modal-overlay">
+
+        <div class="modal-content">
+
+            <div class="modal-header">
+
+                <h3>সম্পূর্ণ বায়োডাটা</h3>
+
+                <button class="close-btn"
+                        onclick="closeModal()">
+                    X
+                </button>
+
+            </div>
+
+            <div class="modal-body"
+                 id="modal-details-content">
+            </div>
+
+        </div>
+
+    </div>
+
+    <script>
+
+        let currentTab = 'dashboard';
+
+        function safeText(v) {
+            return String(v ?? '').replace(
+                /[&<>"']/g,
+                c => ({
+                    '&': '&amp;',
+                    '<': '&lt;',
+                    '>': '&gt;',
+                    '"': '&quot;',
+                    "'": '&#39;'
+                }[c])
+            );
+        }
+
+        function getRecords() {
+            return window.__srbRecords || [];
+        }
+
+        function formatRationDisplay(rationStr) {
+
+            if (!rationStr) return '';
+
+            let parts = String(rationStr).split(' ');
+
+            return `
+                <span style="font-weight:bold;color:red;">
+                    ${safeText(parts[0])}
+                </span>
+                ${safeText(parts[1] || 'ইউনিট')}
+            `;
+        }
+
+        function toggleSidebar() {
+
+            const sidebar =
+                document.getElementById('sidebar');
+
+            sidebar.classList.toggle('open');
+        }
+
+        function closeSidebar() {
+
+            document
+                .getElementById('sidebar')
+                .classList.remove('open');
+        }
+
+        function switchUserTab(tabName, btnElement) {
+
+            currentTab = tabName;
+
+            document
+                .querySelectorAll('.menu-item')
+                .forEach(b => b.classList.remove('active'));
+
+            if (btnElement) {
+                btnElement.classList.add('active');
+            }
+
+            document
+                .querySelectorAll('.view-container')
+                .forEach(v => v.classList.remove('active'));
+
+            if (tabName === 'dashboard') {
+
+                document.getElementById('view-title').innerText =
+                    'ড্যাশবোর্ড';
+
+                document.getElementById('search-container')
+                    .style.display = 'none';
+
+                document.getElementById('dashboard-view')
+                    .classList.add('active');
+
+                loadUserDashboard();
+
+            } else {
+
+                document.getElementById('view-title').innerText =
+                    tabName;
+
+                document.getElementById('table-section-title')
+                    .innerText = tabName + ' তালিকা';
+
+                document.getElementById('search-container')
+                    .style.display = 'block';
+
+                document.getElementById('searchInput').value = '';
+
+                document.getElementById('table-view')
+                    .classList.add('active');
+
+                loadUserTable();
+            }
+
+            closeSidebar();
+        }
+
+        document.addEventListener('keydown', e => {
+
+            if (e.key === 'Escape') {
+                closeSidebar();
+            }
+
+        });
+
+        function loadUserDashboard() {
+
+            const records = getRecords();
+
+            const forces = [
+                "সেনাবাহিনী",
+                "নৌবাহিনীর",
+                "বিমানবাহিনীর",
+                "বিজিবি",
+                "পুলিশ",
+                "আনসার বাহিনী",
+                "সাধারণ"
+            ];
+
+            const container =
+                document.getElementById('user-dashboard-stats');
+
+            container.innerHTML = `
+                <div class="stat-card">
+                    <h4>মোট সদস্য</h4>
+                    <div class="stat-number">
+                        ${records.length}
+                    </div>
+                </div>
+            `;
+
+            forces.forEach(f => {
+
+                let count =
+                    records.filter(r => r.force === f).length;
+
+                container.innerHTML += `
+                    <div class="stat-card">
+                        <h4>${safeText(f)}</h4>
+                        <div class="stat-number">
+                            ${count}
+                        </div>
+                    </div>
+                `;
+            });
+        }
+
+        function loadUserTable(searchQuery = '') {
+
+            const records = getRecords();
+
+            const tbody =
+                document.getElementById('user-table-body');
+
+            tbody.innerHTML = '';
+
+            let filteredRecords =
+                records.filter(r => r.destination === currentTab);
+
+            if (searchQuery.trim() !== '') {
+
+                const q = searchQuery.toLowerCase();
+
+                filteredRecords =
+                    filteredRecords.filter(r =>
+                        [
+                            r.p_id,
+                            r.name,
+                            r.rank,
+                            r.u_id,
+                            r.mobile
+                        ].some(v =>
+                            String(v || '')
+                                .toLowerCase()
+                                .includes(q)
+                        )
+                    );
+            }
+
+            document.getElementById('user-table-total-count')
+                .innerHTML =
+                `মোট - <span>${filteredRecords.length}</span> জন`;
+
+            if (!filteredRecords.length) {
+
+                tbody.innerHTML = `
+                    <tr>
+                        <td colspan="6"
+                            style="text-align:center;padding:15px;color:#777;">
+                            কোনো তথ্য নেই।
+                        </td>
+                    </tr>
+                `;
+
+                return;
+            }
+
+            filteredRecords.forEach((r, index) => {
+
+                tbody.innerHTML += `
+                    <tr>
+
+                        <td>
+                            ${index + 1}
+                        </td>
+
+                        <td>
+                            <b>${safeText(r.p_id)}</b>
+                            <br>
+                            <small style="color:#d32f2f;">
+                                ${safeText(r.u_id)}
+                            </small>
+                        </td>
+
+                        <td>
+                            ${safeText(r.rank)}
+                        </td>
+
+                        <td>
+                            ${safeText(r.name)}
+                        </td>
+
+                        <td>
+                            <button
+                                class="btn-details"
+                                onclick='showDetails(${JSON.stringify(r).replace(/'/g, "&#39;")})'>
+                                দেখুন
+                            </button>
+                        </td>
+
+                        <td>
+                            <a
+                                href="tel:${encodeURIComponent(r.mobile || '')}"
+                                class="call-icon-btn">
+                                📞 কল
+                            </a>
+                        </td>
+
+                    </tr>
+                `;
+            });
+        }
+
+        function filterTable() {
+
+            loadUserTable(
+                document.getElementById('searchInput').value
+            );
+        }
+
+        function showDetails(r) {
+
+            document.getElementById(
+                'modal-details-content'
+            ).innerHTML = `
+
+                <p>
+                    <b>নাম:</b>
+                    ${safeText(r.name)}
+                    (${safeText(r.rank)})
+                </p>
+
+                <p>
+                    <b>ব্যক্তিগত ID:</b>
+                    ${safeText(r.p_id)}
+                </p>
+
+                <p>
+                    <b>ইউনিটের ID:</b>
+                    ${safeText(r.u_id)}
+                </p>
+
+                <p>
+                    <b>কর্ম:</b>
+                    ${safeText(r.duty)}
+                </p>
+
+                <p>
+                    <b>মোবাইল:</b>
+                    ${safeText(r.mobile)}
+                </p>
+
+                <p>
+                    <b>বাহিনী:</b>
+                    ${safeText(r.force)}
+                </p>
+
+                <p>
+                    <b>গন্তব্যস্থল:</b>
+                    ${safeText(r.destination)}
+                </p>
+
+                <p>
+                    <b>রেশন:</b>
+                    ${formatRationDisplay(r.ration)}
+                </p>
+
+                <p>
+                    <b>NID:</b>
+                    ${safeText(r.nid)}
+                </p>
+
+                <p>
+                    <b>জন্ম তারিখ:</b>
+                    ${safeText(r.dob)}
+                </p>
+
+                <p>
+                    <b>ধর্ম:</b>
+                    ${safeText(r.religion)}
+                </p>
+            `;
+
+            document.getElementById('detailsModal')
+                .style.display = 'flex';
+        }
+
+        function closeModal() {
+
+            document.getElementById('detailsModal')
+                .style.display = 'none';
+        }
+
+        document
+            .getElementById('detailsModal')
+            .addEventListener('click', e => {
+
+                if (e.target.id === 'detailsModal') {
+                    closeModal();
+                }
+
+            });
+
+
+        /* =====================================================
+           SRB-8 ANONYMOUS USER AUTHENTICATION
+           ===================================================== */
+
+        const userDb = firebase.firestore();
+
+        const userAuth = firebase.auth();
+
+        let currentAnonymousUid = '';
+
+
+        async function registerAnonymousUser(user) {
+
+            if (!user || !user.uid) {
+                return;
+            }
+
+            currentAnonymousUid = user.uid;
+
+            const memberRef =
+                userDb.collection('activeMembers')
+                    .doc(user.uid);
+
+            try {
+
+                await memberRef.set({
+
+                    uid: user.uid,
+
+                    type: 'anonymous',
+
+                    email: 'anonymous',
+
+                    lastLoginAt:
+                        firebase.firestore.FieldValue.serverTimestamp(),
+
+                    userAgent:
+                        navigator.userAgent || '',
+
+                    platform:
+                        navigator.platform || ''
+
+                }, {
+                    merge: true
+                });
+
+                console.log(
+                    'SRB-8 Anonymous user registered:',
+                    user.uid
+                );
+
+            } catch (err) {
+
+                console.error(
+                    'activeMembers register error:',
+                    err
+                );
+
+            }
+        }
+
+
+        async function startAnonymousLogin() {
+
+            try {
+
+                /*
+                 * আগে থেকেই Anonymous user থাকলে
+                 * নতুন UID তৈরি হবে না।
+                 */
+
+                if (userAuth.currentUser) {
+
+                    await registerAnonymousUser(
+                        userAuth.currentUser
+                    );
+
+                    return;
+                }
+
+
+                /*
+                 * নতুন Anonymous Firebase user তৈরি
+                 */
+
+                const result =
+                    await userAuth.signInAnonymously();
+
+
+                if (result && result.user) {
+
+                    await registerAnonymousUser(
+                        result.user
+                    );
+                }
+
+            } catch (err) {
+
+                console.error(
+                    'Anonymous authentication error:',
+                    err
+                );
+
+                alert(
+                    'User Panel চালু করা যাচ্ছে না। Firebase Anonymous Authentication এবং Firestore Rules পরীক্ষা করুন।'
+                );
+            }
+        }
+
+
+        /*
+         * Authentication state
+         */
+
+        userAuth.onAuthStateChanged(async user => {
+
+            if (user) {
+
+                await registerAnonymousUser(user);
+
+                loadUserDashboard();
+
+                if (currentTab !== 'dashboard') {
+
+                    loadUserTable(
+                        document.getElementById('searchInput').value
+                    );
+                }
+
+            } else {
+
+                /*
+                 * Login screen নেই।
+                 * সরাসরি Anonymous login শুরু হবে।
+                 */
+
+                await startAnonymousLogin();
+            }
+
+        });
+
+
+        /*
+         * Firestore records listener
+         */
+
+        userDb.collection('records').onSnapshot(
+
+            snapshot => {
+
+                window.__srbRecords =
+                    snapshot.docs.map(d => ({
+                        id: d.id,
+                        ...d.data()
+                    }));
+
+                if (userAuth.currentUser) {
+
+                    loadUserDashboard();
+
+                    if (currentTab !== 'dashboard') {
+
+                        loadUserTable(
+                            document.getElementById('searchInput').value
+                        );
+                    }
+                }
+            },
+
+            error => {
+
+                console.error(
+                    'Firestore records error:',
+                    error
+                );
+
+                alert(
+                    'অনলাইন তথ্য লোড করা যায়নি। Firestore Rules পরীক্ষা করুন।'
+                );
+            }
+        );
+
+
+        window.onload = function() {
+
+            if (userAuth.currentUser) {
+
+                loadUserDashboard();
+
+            } else {
+
+                startAnonymousLogin();
+            }
+        };
+
+    </script>
+
+</body>
+</html>
