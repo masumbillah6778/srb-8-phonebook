@@ -1,0 +1,377 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>বকেয়া ক্যালকুলেটর</title>
+
+<style>
+:root {
+  --blue: #1976c9;
+  --blue2: #eaf5ff;
+  --line: #b8dcff;
+  --ink: #092653;
+  --green: #dff8ef;
+  --red: #f20d16;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  padding: 14px;
+  background: #f5faff;
+  color: var(--ink);
+  font-family: "Noto Sans Bengali", "Hind Siliguri", Arial, sans-serif;
+}
+
+.app {
+  max-width: 1100px;
+  margin: auto;
+  background: white;
+  border: 1px solid var(--line);
+  border-radius: 14px;
+  padding: 14px;
+  box-shadow: 0 5px 22px #0a4a8110;
+}
+
+h1 {
+  margin: 0 0 14px;
+  background: linear-gradient(110deg, #1268b4, #3189d0);
+  color: white;
+  text-align: center;
+  padding: 14px 8px;
+  border-radius: 10px;
+  font-size: clamp(25px, 4.4vw, 48px);
+}
+
+.controls {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 12px;
+  margin-bottom: 14px;
+}
+
+.control {
+  background: var(--blue2);
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  padding: 12px;
+}
+
+label {
+  display: block;
+  font-weight: 700;
+  font-size: clamp(17px, 2.6vw, 25px);
+  margin-bottom: 7px;
+}
+
+input, select {
+  font: inherit;
+  font-size: clamp(17px, 2.5vw, 24px);
+  width: 100%;
+  min-width: 0;
+  padding: 9px 12px;
+  border: 1px solid #a8cbed;
+  border-radius: 8px;
+  background: white;
+  color: #111;
+}
+
+.table-wrap {
+  overflow-x: auto;
+  border: 1px solid var(--line);
+  border-radius: 10px;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  min-width: 590px;
+}
+
+th {
+  background: #328bd0;
+  color: white;
+  font-size: clamp(15px, 2.2vw, 23px);
+  padding: 11px 8px;
+}
+
+td {
+  border-top: 1px solid #d2e8fc;
+  padding: 9px 10px;
+  font-size: clamp(17px, 2.5vw, 24px);
+}
+
+td:first-child {
+  font-weight: 700;
+}
+
+td input {
+  background: #f7fffb;
+  border-color: #a8e2ce;
+}
+
+.qty {
+  background: #e8f8f0 !important;
+  border-color: #a4dfc9 !important;
+}
+
+.amount {
+  background: #e8f1fb;
+  text-align: center;
+  font-weight: 700;
+  border-radius: 7px;
+  padding: 8px;
+}
+
+.total {
+  margin-top: 12px;
+  padding: 12px;
+  background: var(--green);
+  border: 1px solid #a5ebd5;
+  border-radius: 10px;
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  gap: 14px;
+  font-size: clamp(19px, 3.5vw, 34px);
+  font-weight: 800;
+  color: #075c3a;
+}
+
+.total-value {
+  background: var(--red);
+  color: white;
+  border-radius: 9px;
+  padding: 8px 18px;
+  min-width: 180px;
+  text-align: center;
+}
+
+.hint {
+  font-size: 14px;
+  color: #52677e;
+  margin: 10px 2px 0;
+}
+
+@media (max-width: 650px) {
+  body {
+    padding: 6px;
+  }
+
+  .app {
+    padding: 8px;
+  }
+
+  .controls {
+    grid-template-columns: 1fr;
+    gap: 8px;
+  }
+
+  .control {
+    padding: 9px;
+  }
+
+  h1 {
+    font-size: 28px;
+  }
+
+  .total {
+    flex-direction: column;
+    gap: 7px;
+  }
+
+  .total-value {
+    width: 100%;
+    min-width: 0;
+  }
+}
+</style>
+</head>
+
+<body>
+<main class="app">
+
+  <h1>🧮 বকেয়া ক্যালকুলেটর</h1>
+
+  <section class="controls">
+    <div class="control">
+      <label for="days">দিন</label>
+      <input id="days" type="number" min="0" step="1" value="30">
+    </div>
+
+    <div class="control">
+      <label for="units">ইউনিট সংখ্যা</label>
+      <input id="units" type="number" min="0" step="0.5" value="1">
+    </div>
+
+    <div class="control">
+      <label for="unitType">একক</label>
+      <select id="unitType">
+        <option value="single">একক রেশন</option>
+        <option value="family">পারিবারিক রেশন</option>
+      </select>
+    </div>
+  </section>
+
+  <div class="table-wrap">
+    <table>
+      <thead>
+        <tr>
+          <th>পণ্যের নাম</th>
+          <th>পরিমাণ</th>
+          <th>একক মূল্য (টাকা)</th>
+          <th>মোট টাকা (টাকা)</th>
+        </tr>
+      </thead>
+      <tbody id="items"></tbody>
+    </table>
+  </div>
+
+  <div class="total">
+    <span>মোট টাকার পরিমাণ =</span>
+    <span class="total-value" id="grandTotal">৳ ০</span>
+  </div>
+
+  <p class="hint">
+    পরিমাণ স্বয়ংক্রিয়ভাবে হিসাব হয়; এই ঘর সম্পাদনা করা যায় না।
+    একক মূল্য পরিবর্তন করলে মোট টাকাও আপডেট হবে।
+  </p>
+
+</main>
+
+<script>
+const products = [
+  { name: "চাল", base: 10.230 },
+  { name: "আটা", base: 8.520 },
+  { name: "তেল", base: 2.540 },
+  { name: "চিনি", base: 1.700 },
+  { name: "ডাল", base: 1.700 }
+];
+
+const bnDigits = s =>
+  String(s).replace(/\d/g, d => "০১২৩৪৫৬৭৮৯"[d]);
+
+const fmtQty = n =>
+  bnDigits(
+    Number(n.toFixed(3)).toLocaleString("en-US", {
+      minimumFractionDigits: 3,
+      maximumFractionDigits: 3
+    })
+  );
+
+const fmtMoney = n =>
+  "৳ " + bnDigits(Math.round(n).toLocaleString("en-US"));
+
+const tbody = document.getElementById("items");
+
+products.forEach((p, i) => {
+  const tr = document.createElement("tr");
+
+  tr.innerHTML = `
+    <td>${p.name}</td>
+    <td>
+      <input
+        class="qty"
+        aria-label="${p.name} পরিমাণ"
+        readonly
+        tabindex="-1"
+      >
+    </td>
+    <td>
+      <input
+        class="price"
+        type="number"
+        min="0"
+        step="any"
+        aria-label="${p.name} একক মূল্য"
+        value="0"
+      >
+    </td>
+    <td>
+      <div class="amount" id="amount-${i}">৳ ০</div>
+    </td>
+  `;
+
+  tbody.appendChild(tr);
+});
+
+function calculate() {
+  const days = Math.max(
+    0,
+    Number(document.getElementById("days").value) || 0
+  );
+
+  const units = Math.max(
+    0,
+    Number(document.getElementById("units").value) || 0
+  );
+
+  const family =
+    document.getElementById("unitType").value === "family";
+
+  let grand = 0;
+
+  products.forEach((p, i) => {
+    let effectiveUnits = units;
+    let quantity;
+
+    if (family) {
+      if (i !== 4) {
+        effectiveUnits =
+          units === 0
+            ? (days > 0 ? 1 : 0)
+            : units + 1;
+      }
+
+      // ডাল (i === 4): শুধু ইউনিট অনুযায়ী হিসাব হবে।
+      // অন্যান্য পারিবারিক পণ্যের আগের হিসাব অপরিবর্তিত।
+      if (i === 4) {
+        quantity = p.base * units;
+      } else {
+        quantity = p.base * effectiveUnits * (days / 30);
+      }
+    } else {
+      // একক রেশনে সব পণ্য ইউনিট অনুযায়ী হিসাব হবে।
+      quantity = p.base * units;
+    }
+
+    tbody.rows[i].querySelector(".qty").value =
+      fmtQty(quantity);
+
+    const price = Math.max(
+      0,
+      Number(tbody.rows[i].querySelector(".price").value) || 0
+    );
+
+    const amount = quantity * price;
+
+    document.getElementById(`amount-${i}`).textContent =
+      fmtMoney(amount);
+
+    grand += amount;
+  });
+
+  document.getElementById("grandTotal").textContent =
+    fmtMoney(grand);
+}
+
+["days", "units", "unitType"].forEach(id => {
+  document.getElementById(id).addEventListener(
+    id === "unitType" ? "change" : "input",
+    calculate
+  );
+});
+
+tbody.querySelectorAll(".price").forEach(el => {
+  el.addEventListener("input", calculate);
+});
+
+calculate();
+</script>
+
+</body>
+</html>
